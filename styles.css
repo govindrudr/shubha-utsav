@@ -6579,3 +6579,19 @@ section[id] {
         gap: 10px !important;
     }
 }
+
+/* Custom Gift Box Builder Mobile Fixes */
+@media (max-width: 991px) {
+    .builder-container {
+        grid-template-columns: 1fr !important;
+        gap: 30px !important;
+    }
+}
+
+@media (max-width: 600px) {
+    .builder-sidebar,
+    .builder-preview-card {
+        padding: 20px 16px !important;
+        width: 100% !important;
+    }
+}

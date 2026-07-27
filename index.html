@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -174,7 +174,7 @@
     <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
 
     <!-- Main Style Sheet — critical, load synchronously -->
-    <link rel="stylesheet" href="styles.css?v=1.0.3">
+    <link rel="stylesheet" href="styles.css?v=1.0.4">
 
     <!-- Confetti CDN — deferred, not needed for initial paint -->
     <script defer src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
@@ -203,6 +203,9 @@
             <div class="nav-actions">
                 <button class="btn-secondary" onclick="triggerCatalogueDownload()"><i class="fa-solid fa-download"></i> Catalogue</button>
                 <button class="btn-primary trigger-quote" onclick="triggerQuoteRequest()">Get Quote</button>
+                <button class="mobile-menu-toggle" id="mobile-menu-toggle" aria-label="Toggle Menu" onclick="toggleMobileMenu()">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
             </div>
         </div>
     </header>
@@ -2406,7 +2409,7 @@
     <div class="toast-notification" id="toast-notification"></div>
 
     <!-- Main JavaScript Logic — deferred so HTML parses first -->
-    <script defer src="app.js?v=1.0.4"></script>
+    <script defer src="app.js?v=1.0.5"></script>
 
     <!-- Logo onerror fallback: replace broken images with styled company-name text -->
     <script>
@@ -2445,6 +2448,33 @@
       <span class="wa-float-badge">💬</span>
     </a>
 
+
+    <!-- Mobile Drawer Overlay -->
+    <div class="mobile-menu-drawer" id="mobile-menu-drawer">
+        <div class="mobile-drawer-header">
+            <a href="#" class="logo" onclick="toggleMobileMenu()">
+                <span class="brand-sub">SHUBHA</span>
+                <span class="brand-divider">|</span>
+                <span class="brand-main">UTSAV</span>
+            </a>
+            <button class="mobile-drawer-close" onclick="toggleMobileMenu()">&times;</button>
+        </div>
+        <nav class="mobile-drawer-links">
+            <a href="#hampers" class="mobile-drawer-link" onclick="toggleMobileMenu()">City Hampers</a>
+            <a href="#pricing" class="mobile-drawer-link" onclick="toggleMobileMenu()">Pricing</a>
+            <a href="#packaging" class="mobile-drawer-link" onclick="toggleMobileMenu()">Packaging</a>
+            <a href="#process" class="mobile-drawer-link" onclick="toggleMobileMenu()">Process</a>
+            <a href="#estimator" class="mobile-drawer-link" onclick="toggleMobileMenu()">Estimator</a>
+            <a href="#builder" class="mobile-drawer-link" onclick="toggleMobileMenu()">Builder</a>
+            <a href="#lucky-draw" class="mobile-drawer-link" onclick="toggleMobileMenu()" style="color:var(--gold-solid);font-weight:700;">🎟 Lucky Draw</a>
+            <a href="#social" class="mobile-drawer-link" onclick="toggleMobileMenu()">Gallery</a>
+            <a href="#payment" class="mobile-drawer-link" onclick="toggleMobileMenu()">Payment</a>
+        </nav>
+        <div class="mobile-drawer-actions">
+            <button class="btn-secondary w-full" onclick="triggerCatalogueDownload(); toggleMobileMenu()"><i class="fa-solid fa-download"></i> Catalogue</button>
+            <button class="btn-primary w-full" onclick="triggerQuoteRequest(); toggleMobileMenu()">Get Quote</button>
+        </div>
+    </div>
 
     <!-- Hamper Image Lightbox Modal -->
     <div class="lightbox-modal" id="hamper-lightbox" onclick="closeLightbox()">

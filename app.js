@@ -1955,3 +1955,14 @@ window.prevHamperSlide = prevHamperSlide;
 window.setHamperSlide = setHamperSlide;
 window.openLightbox = openLightbox;
 window.closeLightbox = closeLightbox;
+
+/* ============================================================ 
+   MOBILE DRAWER NAVIGATION CONTROLLER 
+   ============================================================ */
+function toggleMobileMenu() {
+    const drawer = document.getElementById('mobile-menu-drawer');
+    if (drawer) {
+        drawer.classList.toggle('active');
+    }
+}
+window.toggleMobileMenu = toggleMobileMenu;

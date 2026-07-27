@@ -1,0 +1,59 @@
+{
+  "leads": [
+    {
+      "name": "Test User",
+      "companyName": "Google",
+      "email": "test@google.com",
+      "phone": "9999999999",
+      "employeeCount": 50,
+      "budget": 1500,
+      "festival": "Diwali Gifting",
+      "selectedCity": "Download Hub",
+      "selectedHamper": "N/A",
+      "inquiryType": "Catalogue Request",
+      "verificationStatus": "Verified",
+      "isSuspicious": false,
+      "spamFlags": [],
+      "remarks": "",
+      "leadId": "LEAD-1001",
+      "createdDate": "2026-07-27T12:21:39.839Z",
+      "lastUpdated": "2026-07-27T12:21:39.840Z"
+    },
+    {
+      "name": "Test User",
+      "companyName": "Google",
+      "email": "test@google.com",
+      "phone": "9999999999",
+      "employeeCount": 50,
+      "budget": 1500,
+      "festival": "Diwali Gifting",
+      "selectedCity": "Download Hub",
+      "selectedHamper": "N/A",
+      "inquiryType": "Catalogue Request",
+      "verificationStatus": "Suspicious",
+      "isSuspicious": true,
+      "spamFlags": [
+        "Duplicate inquiry email within 24h",
+        "Duplicate inquiry phone within 24h"
+      ],
+      "remarks": "",
+      "leadId": "LEAD-1002",
+      "createdDate": "2026-07-27T12:27:36.379Z",
+      "lastUpdated": "2026-07-27T12:27:36.379Z"
+    }
+  ],
+  "orders": [],
+  "otps": [
+    {
+      "email": "test@google.com",
+      "otp": "237796",
+      "expiresAt": "2026-07-27T10:01:38.328Z",
+      "attempts": 1,
+      "verified": true,
+      "createdAt": "2026-07-27T09:56:38.339Z",
+      "_id": "kt0i3p5r1",
+      "createdDate": "2026-07-27T09:56:38.415Z",
+      "lastUpdated": "2026-07-27T09:57:38.101Z"
+    }
+  ]
+}

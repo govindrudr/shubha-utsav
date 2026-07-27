@@ -6595,3 +6595,19 @@ section[id] {
         width: 100% !important;
     }
 }
+
+/* Corporate Personalization Lab Mobile Fixes */
+@media (max-width: 991px) {
+    .lab-container {
+        grid-template-columns: 1fr !important;
+        gap: 30px !important;
+    }
+}
+
+@media (max-width: 600px) {
+    .preview-panel,
+    .controls-panel {
+        padding: 20px 16px !important;
+        width: 100% !important;
+    }
+}

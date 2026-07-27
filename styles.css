@@ -1,4 +1,4 @@
-/* --------------------------------------------------
+﻿/* --------------------------------------------------
    PREMIUM DIWALI GIFTING - LUXURY DESIGN SYSTEM
    -------------------------------------------------- */
 
@@ -6465,4 +6465,117 @@ section[id] {
 
 @media (prefers-reduced-motion: reduce) {
   .whatsapp-float { animation: none; }
+}
+
+
+/* ============================================================ 
+   MOBILE QUICK NAVIGATION & UI OVERFLOW FIXES 
+   ============================================================ */
+.mobile-nav-section {
+    display: none;
+    padding: 30px 24px;
+    background: var(--bg-panel);
+    border-bottom: 1px solid rgba(212, 175, 55, 0.15);
+}
+
+@media (max-width: 900px) {
+    .mobile-nav-section {
+        display: block;
+    }
+}
+
+.mobile-nav-container {
+    max-width: 600px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.mobile-nav-tag {
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--gold-solid);
+    font-family: var(--font-sans);
+    font-size: 0.8rem;
+    font-weight: 700;
+    display: block;
+    margin-bottom: 16px;
+}
+
+.mobile-nav-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+}
+
+.mobile-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 14px 10px;
+    background: rgba(7, 8, 13, 0.5);
+    border: 1px solid rgba(212, 175, 55, 0.15);
+    border-radius: 12px;
+    text-decoration: none;
+    transition: var(--transition-smooth);
+}
+
+.mobile-nav-item:hover {
+    border-color: var(--gold-solid);
+    background: rgba(212, 175, 55, 0.08);
+}
+
+.mobile-nav-icon {
+    font-size: 1.4rem;
+    margin-bottom: 6px;
+}
+
+.mobile-nav-title {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    font-weight: 600;
+    font-family: var(--font-sans);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+@media (max-width: 400px) {
+    .mobile-nav-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Mobile UI Fixes for Header, Hero CTAs, and Quotation Modal */
+@media (max-width: 600px) {
+    /* Header layout optimization - hide secondary buttons to prevent horizontal overflow */
+    .nav-actions .btn-secondary,
+    .nav-actions .btn-admin-gear {
+        display: none !important;
+    }
+    
+    /* Stacking Hero primary and outline buttons vertically */
+    .hero-actions {
+        flex-direction: column !important;
+        gap: 12px !important;
+        width: 100% !important;
+    }
+    
+    .hero-actions .btn-primary,
+    .hero-actions .btn-outline {
+        width: 100% !important;
+        text-align: center !important;
+    }
+    
+    /* Lead Modal formatting fixes - reduce padding and prevent overflow */
+    .lead-modal-container {
+        padding: 24px 16px !important;
+        width: 95% !important;
+        max-height: 95vh !important;
+    }
+    
+    /* Force meet call scheduler slots to stack vertically */
+    .date-time-group {
+        grid-template-columns: 1fr !important;
+        gap: 10px !important;
+    }
 }

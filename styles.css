@@ -6611,3 +6611,210 @@ section[id] {
         width: 100% !important;
     }
 }
+
+/* ============================================================ 
+   HAMPER CAROUSEL & LIGHTBOX STYLE DEFINITIONS 
+   ============================================================ */
+.hamper-carousel-container {
+    grid-column: span 1;
+    grid-row: span 2;
+    position: relative;
+    background: rgba(7, 8, 13, 0.5);
+    border: var(--border-gold);
+    border-radius: 16px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 16px;
+}
+
+.hamper-carousel-track-wrapper {
+    position: relative;
+    width: 100%;
+    height: calc(100% - 50px);
+    overflow: hidden;
+    border-radius: 8px;
+}
+
+.hamper-carousel-track {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.5s ease-in-out;
+}
+
+.hamper-slide {
+    min-width: 100%;
+    width: 100%;
+    height: 100%;
+    position: relative;
+    display: none;
+    flex-direction: column;
+}
+
+.hamper-slide.active {
+    display: flex;
+}
+
+.hamper-slide img {
+    width: 100%;
+    height: 80%;
+    object-fit: cover;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: opacity 0.3s ease;
+}
+
+.hamper-slide img:hover {
+    opacity: 0.9;
+}
+
+.hamper-slide-info {
+    padding: 10px 4px 0 4px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.hamper-slide-info h4 {
+    font-size: 0.95rem;
+    color: var(--cream);
+    font-weight: 600;
+    margin: 0;
+}
+
+.hamper-slide-price {
+    font-size: 0.9rem;
+    color: var(--gold-solid);
+    font-weight: 700;
+}
+
+.hamper-carousel-controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 10px;
+}
+
+.hamper-carousel-btn {
+    background: rgba(212, 175, 55, 0.15);
+    border: 1px solid rgba(212, 175, 55, 0.4);
+    color: var(--gold-solid);
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: var(--transition-smooth);
+}
+
+.hamper-carousel-btn:hover {
+    background: var(--gold-solid);
+    color: var(--bg-dark);
+}
+
+.hamper-carousel-dots {
+    display: flex;
+    gap: 8px;
+}
+
+.hamper-carousel-dots .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(250, 247, 240, 0.25);
+    cursor: pointer;
+    transition: var(--transition-smooth);
+}
+
+.hamper-carousel-dots .dot.active {
+    background: var(--gold-solid);
+    transform: scale(1.2);
+}
+
+@media (min-width: 901px) {
+    .hamper-carousel-container {
+        grid-column: 3;
+    }
+}
+
+@media (max-width: 900px) {
+    .hamper-carousel-container {
+        grid-column: span 2;
+        grid-row: auto;
+        height: 380px;
+    }
+}
+
+@media (max-width: 600px) {
+    .hamper-carousel-container {
+        grid-column: span 1;
+        grid-row: auto;
+        height: 340px;
+    }
+}
+
+/* Lightbox Modal for Hamper Preview */
+.lightbox-modal {
+    display: none;
+    position: fixed;
+    z-index: 5000;
+    padding-top: 50px;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(7, 8, 13, 0.95);
+    backdrop-filter: blur(15px);
+    align-items: center;
+    justify-content: center;
+}
+
+.lightbox-content {
+    margin: auto;
+    display: block;
+    max-width: 85%;
+    max-height: 80vh;
+    object-fit: contain;
+    border: 2px solid var(--gold-solid);
+    border-radius: 12px;
+    box-shadow: var(--gold-glow);
+    animation: zoomIn 0.3s ease-out;
+}
+
+@keyframes zoomIn {
+    from { transform: scale(0.85); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+.lightbox-close {
+    position: absolute;
+    top: 25px;
+    right: 35px;
+    color: var(--cream);
+    font-size: 40px;
+    font-weight: bold;
+    transition: 0.3s;
+    cursor: pointer;
+}
+
+.lightbox-close:hover {
+    color: var(--gold-solid);
+}
+
+.lightbox-caption {
+    margin: auto;
+    display: block;
+    width: 80%;
+    max-width: 700px;
+    text-align: center;
+    color: var(--cream);
+    padding: 15px 0;
+    font-family: var(--font-serif);
+    font-size: 1.1rem;
+    font-weight: 600;
+}

@@ -1,4 +1,4 @@
-/* --------------------------------------------------
+﻿/* --------------------------------------------------
    SHUBH UTSAV - PREMIUM FULL-STACK JAVASCRIPT
    -------------------------------------------------- */
 
@@ -1888,3 +1888,63 @@ function openPrivacyModal() {
     }
   }, { passive: true });
 })();
+
+
+/* ============================================================ 
+   HAMPER CAROUSEL & LIGHTBOX CONTROLLER 
+   ============================================================ */
+let currentHamperSlide = 0;
+
+function showHamperSlide(index) {
+    const slides = document.querySelectorAll('.hamper-slide');
+    const dots = document.querySelectorAll('.hamper-carousel-dots .dot');
+    if (!slides.length) return;
+    
+    if (index >= slides.length) {
+        currentHamperSlide = 0;
+    } else if (index < 0) {
+        currentHamperSlide = slides.length - 1;
+    } else {
+        currentHamperSlide = index;
+    }
+    
+    slides.forEach((slide, i) => {
+        slide.classList.toggle('active', i === currentHamperSlide);
+    });
+    
+    dots.forEach((dot, i) => {
+        dot.classList.toggle('active', i === currentHamperSlide);
+    });
+}
+
+function nextHamperSlide() {
+    showHamperSlide(currentHamperSlide + 1);
+}
+
+function prevHamperSlide() {
+    showHamperSlide(currentHamperSlide - 1);
+}
+
+function setHamperSlide(index) {
+    showHamperSlide(index);
+}
+
+function openLightbox(src, caption) {
+    const modal = document.getElementById('hamper-lightbox');
+    const img = document.getElementById('lightbox-img');
+    const captionText = document.getElementById('lightbox-caption');
+    if (!modal || !img) return;
+    
+    modal.style.display = "flex";
+    img.src = src;
+    if (captionText) {
+        captionText.innerHTML = caption;
+    }
+}
+
+function closeLightbox() {
+    const modal = document.getElementById('hamper-lightbox');
+    if (modal) {
+        modal.style.display = "none";
+    }
+}

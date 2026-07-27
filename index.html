@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -174,7 +174,7 @@
     <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
 
     <!-- Main Style Sheet — critical, load synchronously -->
-    <link rel="stylesheet" href="styles.css?v=1.0.2">
+    <link rel="stylesheet" href="styles.css?v=1.0.3">
 
     <!-- Confetti CDN — deferred, not needed for initial paint -->
     <script defer src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
@@ -1664,29 +1664,57 @@
                             <div class="reel-duration">1:12</div>
                         </div>
                     </div>
-                    <!-- Photo placeholders -->
-                    <div class="gallery-item gallery-photo">
-                        <div class="gallery-photo-inner">
-                            <i class="fa-solid fa-box-open gallery-ph-icon"></i>
-                            <span>Executive Gold Hamper</span>
+                    <!-- Carousel Slider container for hampers -->
+                    <div class="hamper-carousel-container">
+                        <div class="hamper-carousel-track-wrapper">
+                            <div class="hamper-carousel-track" id="hamper-carousel-track">
+                                <div class="hamper-slide active">
+                                    <img src="assets/hampers/hamper-500.webp" alt="Diwali Hamper - ₹500 Tier" loading="lazy" onclick="openLightbox('assets/hampers/hamper-500.webp', 'Utsav Starter Box — ₹500')">
+                                    <div class="hamper-slide-info">
+                                        <h4>Utsav Starter Box</h4>
+                                        <span class="hamper-slide-price">₹500</span>
+                                    </div>
+                                </div>
+                                <div class="hamper-slide">
+                                    <img src="assets/hampers/hamper-1000.webp" alt="Diwali Hamper - ₹1000 Tier" loading="lazy" onclick="openLightbox('assets/hampers/hamper-1000.webp', 'Festive Delight Box — ₹1,000')">
+                                    <div class="hamper-slide-info">
+                                        <h4>Festive Delight Box</h4>
+                                        <span class="hamper-slide-price">₹1,000</span>
+                                    </div>
+                                </div>
+                                <div class="hamper-slide">
+                                    <img src="assets/hampers/hamper-1500.webp" alt="Diwali Hamper - ₹1500 Tier" loading="lazy" onclick="openLightbox('assets/hampers/hamper-1500.webp', 'Premium Shubh Hamper — ₹1,500')">
+                                    <div class="hamper-slide-info">
+                                        <h4>Premium Shubh Hamper</h4>
+                                        <span class="hamper-slide-price">₹1,500</span>
+                                    </div>
+                                </div>
+                                <div class="hamper-slide">
+                                    <img src="assets/hampers/hamper-2000.webp" alt="Diwali Hamper - ₹2000 Tier" loading="lazy" onclick="openLightbox('assets/hampers/hamper-2000.webp', 'Royal Celebrations Chest — ₹2,000')">
+                                    <div class="hamper-slide-info">
+                                        <h4>Royal Celebrations Chest</h4>
+                                        <span class="hamper-slide-price">₹2,000</span>
+                                    </div>
+                                </div>
+                                <div class="hamper-slide">
+                                    <img src="assets/hampers/hamper-2500.webp" alt="Diwali Hamper - ₹2500 Tier" loading="lazy" onclick="openLightbox('assets/hampers/hamper-2500.webp', 'Imperial Luxury Chest — ₹2,500')">
+                                    <div class="hamper-slide-info">
+                                        <h4>Imperial Luxury Chest</h4>
+                                        <span class="hamper-slide-price">₹2,500</span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="gallery-item gallery-photo">
-                        <div class="gallery-photo-inner">
-                            <i class="fa-solid fa-gift gallery-ph-icon"></i>
-                            <span>Luxury Wooden Chest</span>
-                        </div>
-                    </div>
-                    <div class="gallery-item gallery-photo">
-                        <div class="gallery-photo-inner">
-                            <i class="fa-solid fa-map-marked-alt gallery-ph-icon"></i>
-                            <span>Hyperlocal Pune Hamper</span>
-                        </div>
-                    </div>
-                    <div class="gallery-item gallery-photo">
-                        <div class="gallery-photo-inner">
-                            <i class="fa-solid fa-star gallery-ph-icon"></i>
-                            <span>Custom Logo Branding</span>
+                        <div class="hamper-carousel-controls">
+                            <button class="hamper-carousel-btn prev-btn" onclick="prevHamperSlide()" aria-label="Previous hamper"><i class="fa-solid fa-chevron-left"></i></button>
+                            <div class="hamper-carousel-dots" id="hamper-carousel-dots">
+                                <span class="dot active" onclick="setHamperSlide(0)"></span>
+                                <span class="dot" onclick="setHamperSlide(1)"></span>
+                                <span class="dot" onclick="setHamperSlide(2)"></span>
+                                <span class="dot" onclick="setHamperSlide(3)"></span>
+                                <span class="dot" onclick="setHamperSlide(4)"></span>
+                            </div>
+                            <button class="hamper-carousel-btn next-btn" onclick="nextHamperSlide()" aria-label="Next hamper"><i class="fa-solid fa-chevron-right"></i></button>
                         </div>
                     </div>
                 </div>
@@ -2416,5 +2444,13 @@
       <span class="wa-float-label">Chat on WhatsApp</span>
       <span class="wa-float-badge">💬</span>
     </a>
+
+
+    <!-- Hamper Image Lightbox Modal -->
+    <div class="lightbox-modal" id="hamper-lightbox" onclick="closeLightbox()">
+        <span class="lightbox-close" onclick="closeLightbox()">&times;</span>
+        <img class="lightbox-content" id="lightbox-img" alt="Enlarged Hamper Preview" onclick="event.stopPropagation()">
+        <div id="lightbox-caption" class="lightbox-caption"></div>
+    </div>
 </body>
 </html>

@@ -1948,3 +1948,10 @@ function closeLightbox() {
         modal.style.display = "none";
     }
 }
+
+// Explicitly bind slider and lightbox functions to window for inline onclick handlers
+window.nextHamperSlide = nextHamperSlide;
+window.prevHamperSlide = prevHamperSlide;
+window.setHamperSlide = setHamperSlide;
+window.openLightbox = openLightbox;
+window.closeLightbox = closeLightbox;

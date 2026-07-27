@@ -174,7 +174,7 @@
     <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
 
     <!-- Main Style Sheet — critical, load synchronously -->
-    <link rel="stylesheet" href="styles.css?v=1.0.4">
+    <link rel="stylesheet" href="styles.css?v=1.0.5">
 
     <!-- Confetti CDN — deferred, not needed for initial paint -->
     <script defer src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
@@ -273,19 +273,19 @@
         <section class="stats-section">
             <div class="stats-container">
                 <div class="stat-item">
-                    <h3 class="stat-number">10,000+</h3>
+                    <h3 class="stat-number" data-target="10000">0+</h3>
                     <p class="stat-label">Hampers Delivered</p>
                 </div>
                 <div class="stat-item">
-                    <h3 class="stat-number">100+</h3>
+                    <h3 class="stat-number" data-target="100">0+</h3>
                     <p class="stat-label">Corporate Clients</p>
                 </div>
                 <div class="stat-item">
-                    <h3 class="stat-number">25+</h3>
+                    <h3 class="stat-number" data-target="25">0+</h3>
                     <p class="stat-label">Cities Covered</p>
                 </div>
                 <div class="stat-item">
-                    <h3 class="stat-number">95%</h3>
+                    <h3 class="stat-number" data-target="95">0%</h3>
                     <p class="stat-label">Repeat Customers</p>
                 </div>
             </div>
@@ -455,22 +455,22 @@
             <!-- Stats Strip -->
             <div class="logo-stats-strip">
                 <div class="stat-item">
-                    <span class="stat-number">50+</span>
+                    <span class="stat-number" data-target="50">0+</span>
                     <span class="stat-label">Enterprise Clients</span>
                 </div>
                 <div class="stat-divider"></div>
                 <div class="stat-item">
-                    <span class="stat-number">8</span>
+                    <span class="stat-number" data-target="8">0</span>
                     <span class="stat-label">Cities Served</span>
                 </div>
                 <div class="stat-divider"></div>
                 <div class="stat-item">
-                    <span class="stat-number">₹5Cr+</span>
+                    <span class="stat-number" data-target="5">₹0Cr+</span>
                     <span class="stat-label">Gifts Delivered</span>
                 </div>
                 <div class="stat-divider"></div>
                 <div class="stat-item">
-                    <span class="stat-number">98%</span>
+                    <span class="stat-number" data-target="98">0%</span>
                     <span class="stat-label">Client Satisfaction</span>
                 </div>
             </div>
@@ -2409,7 +2409,7 @@
     <div class="toast-notification" id="toast-notification"></div>
 
     <!-- Main JavaScript Logic — deferred so HTML parses first -->
-    <script defer src="app.js?v=1.0.5"></script>
+    <script defer src="app.js?v=1.0.6"></script>
 
     <!-- Logo onerror fallback: replace broken images with styled company-name text -->
     <script>

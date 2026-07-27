@@ -1966,3 +1966,78 @@ function toggleMobileMenu() {
     }
 }
 window.toggleMobileMenu = toggleMobileMenu;
+
+/* ============================================================ 
+   SCROLL REVEAL & ANIMATED STAT COUNTERS 
+   ============================================================ */
+function initScrollAnimations() {
+    // 1. Reveal animations on scroll
+    const sections = document.querySelectorAll('section');
+    sections.forEach(sec => sec.classList.add('reveal'));
+
+    const revealObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('reveal-active');
+            }
+        });
+    }, { threshold: 0.1 });
+
+    sections.forEach(sec => revealObserver.observe(sec));
+
+    // 2. Stats number counters
+    const counters = document.querySelectorAll('[data-target]');
+    const speed = 100;
+
+    const startCounter = (counter) => {
+        const target = +counter.getAttribute('data-target');
+        const originalText = counter.innerText;
+        let count = 0;
+        const inc = target / speed;
+
+        const updateCount = () => {
+            count += inc;
+            if (count < target) {
+                const newVal = Math.ceil(count);
+                if (originalText.includes('%')) {
+                    counter.innerText = newVal + '%';
+                } else if (originalText.includes('₹')) {
+                    counter.innerText = '₹' + newVal + 'Cr+';
+                } else if (originalText.includes('+')) {
+                    counter.innerText = newVal.toLocaleString() + '+';
+                } else {
+                    counter.innerText = newVal;
+                }
+                requestAnimationFrame(updateCount);
+            } else {
+                if (originalText.includes('%')) {
+                    counter.innerText = target + '%';
+                } else if (originalText.includes('₹')) {
+                    counter.innerText = '₹' + target + 'Cr+';
+                } else if (originalText.includes('+')) {
+                    counter.innerText = target.toLocaleString() + '+';
+                } else {
+                    counter.innerText = target;
+                }
+            }
+        };
+        updateCount();
+    };
+
+    const counterObserver = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                startCounter(entry.target);
+                observer.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.5 });
+
+    counters.forEach(counter => counterObserver.observe(counter));
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initScrollAnimations);
+} else {
+    initScrollAnimations();
+}

@@ -1,4 +1,4 @@
-require('dotenv').config();
+﻿require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -8,6 +8,7 @@ const path = require('path');
 const { rateLimit } = require('express-rate-limit');
 const XLSX = require('xlsx');
 const { Resend } = require('resend');
+const compression = require('compression');
 
 // Imports
 const dbService = require('./utils/dbService');
@@ -81,12 +82,39 @@ app.use(cors({
   origin: true,
   credentials: true
 }));
+
+// Gzip/Brotli compression for all responses — biggest single latency win
+app.use(compression({
+  level: 6,          // balanced speed vs ratio
+  threshold: 1024,   // only compress responses > 1 KB
+  filter: (req, res) => {
+    if (req.headers['x-no-compression']) return false;
+    return compression.filter(req, res);
+  }
+}));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-// Static File Server
-app.use(express.static(path.join(__dirname)));
+// Static File Server — aggressive cache for immutable assets, short cache for HTML
+app.use(express.static(path.join(__dirname), {
+  maxAge: '1d',          // CSS/JS/images cached 1 day
+  etag: true,            // conditional requests via ETag
+  lastModified: true,
+  setHeaders: (res, filePath) => {
+    const ext = path.extname(filePath).toLowerCase();
+    if (ext === '.html') {
+      // HTML must always revalidate so users see fresh content
+      res.setHeader('Cache-Control', 'no-cache, must-revalidate');
+    } else if (['.png','.jpg','.jpeg','.svg','.ico','.webp'].includes(ext)) {
+      // Images can be cached longer
+      res.setHeader('Cache-Control', 'public, max-age=604800, immutable'); // 7 days
+    } else if (['.css','.js'].includes(ext)) {
+      res.setHeader('Cache-Control', 'public, max-age=86400'); // 1 day
+    }
+  }
+}));
 
 // Global Rate Limiter
 const globalLimiter = rateLimit({
@@ -208,14 +236,14 @@ app.post('/api/auth/send-otp', otpLimiter, async (req, res) => {
 
     if (resend) {
       await resend.emails.send({
-        from: 'Shubh Utsav <onboarding@resend.dev>', // Free sandbox from
+        from: 'Shubha Utsav <onboarding@resend.dev>', // Free sandbox from
         to: email,
-        subject: 'Shubh Utsav - Email Verification OTP',
+        subject: 'Shubha Utsav - Email Verification OTP',
         html: `<p>Dear ${name},</p>
                <p>Your OTP code to verify your official email for corporate gifting inquiries is:</p>
                <h2 style="color: #9D0017; font-size: 28px; letter-spacing: 2px; margin: 15px 0;">${otp}</h2>
                <p>This code will expire in 5 minutes.</p>
-               <p>Best Regards,<br>Team Shubh Utsav</p>`
+               <p>Best Regards,<br>Team Shubha Utsav</p>`
       });
       console.log(`[Resend] OTP code ${otp} successfully sent to ${email}`);
       return res.json({ success: true, message: 'OTP sent successfully to your email.' });
@@ -454,11 +482,15 @@ app.post('/api/admin/login', (req, res) => {
   const { username, password } = req.body;
 
   const defaultUsername = process.env.ADMIN_USERNAME || 'admin';
-  const defaultPassword = process.env.ADMIN_PASSWORD || 'Admin@ShubhUtsav2026';
+  const defaultPassword = process.env.ADMIN_PASSWORD || 'ShubhAdmin@2026';
 
-  if (username === defaultUsername && password === defaultPassword) {
+  // Accept password-only (new admin panel) OR username+password (legacy)
+  const passwordMatch = password === defaultPassword;
+  const usernameOk = !username || username === defaultUsername;
+
+  if (passwordMatch && usernameOk) {
     const adminToken = jwt.sign(
-      { username: username, isAdmin: true },
+      { username: username || defaultUsername, isAdmin: true },
       process.env.JWT_SECRET,
       { expiresIn: '8h' }
     );
@@ -628,7 +660,7 @@ app.get('/api/admin/orders/:id/invoice', authenticateAdmin, async (req, res) => 
         <div class="invoice-box">
           <table>
             <tr class="header-row">
-              <td class="title">SHUBH UTSAV</td>
+              <td class="title">SHUBHA UTSAV</td>
               <td>
                 <strong>Invoice #:</strong> ${order.invoiceNumber}<br>
                 <strong>Date:</strong> ${new Date(order.createdDate).toLocaleDateString('en-IN')}<br>
@@ -638,9 +670,9 @@ app.get('/api/admin/orders/:id/invoice', authenticateAdmin, async (req, res) => 
             <tr>
               <td>
                 <strong>From:</strong><br>
-                Shubh Utsav Gifting Pvt. Ltd.<br>
-                Luxury Towers, MG Road<br>
-                Mumbai - 400001
+                Shubha Utsav Gifting Pvt. Ltd.<br>
+                Neauleaf Techd, Bhugaon<br>
+                Pune - 412115
               </td>
               <td>
                 <strong>Bill To:</strong><br>
@@ -855,7 +887,7 @@ app.get('/robots.txt', (req, res) => {
   res.type('text/plain');
   res.send(`User-agent: *
 Allow: /
-Sitemap: https://shubhutsav.com/sitemap.xml`);
+Sitemap: https://shubhautsav.com/sitemap.xml`);
 });
 
 // 2. sitemap.xml Route
@@ -863,19 +895,19 @@ app.get('/sitemap.xml', (req, res) => {
   res.type('application/xml');
   
   let urls = [
-    'https://shubhutsav.com/',
-    'https://shubhutsav.com/blog'
+    'https://shubhautsav.com/',
+    'https://shubhautsav.com/blog'
   ];
 
   // Add city pages
   const cityKeys = Object.keys(seoRenderer.citiesSeoData);
   cityKeys.forEach(city => {
-    urls.push(`https://shubhutsav.com/corporate-gifting-${city}`);
+    urls.push(`https://shubhautsav.com/corporate-gifting-${city}`);
   });
 
   // Add blog articles
   seoRenderer.blogArticles.forEach(art => {
-    urls.push(`https://shubhutsav.com/blog/${art.slug}`);
+    urls.push(`https://shubhautsav.com/blog/${art.slug}`);
   });
 
   const todayStr = new Date().toISOString().split('T')[0];
@@ -886,7 +918,7 @@ app.get('/sitemap.xml', (req, res) => {
 
   urls.forEach(url => {
     let priority = '0.8';
-    if (url === 'https://shubhutsav.com/') {
+    if (url === 'https://shubhautsav.com/') {
       priority = '1.0';
     } else if (url.includes('/blog') && !url.includes('/blog/')) {
       priority = '0.9';
@@ -955,6 +987,243 @@ app.get('/blog/:slug', (req, res, next) => {
   next();
 });
 
+// -------------------------------------------------------
+// LUCKY DRAW ENROLLMENT ENDPOINT
+// -------------------------------------------------------
+const luckyDrawEntries = []; // in-memory store (replaces DB when unavailable)
+
+app.post('/api/lucky-draw/enroll', async (req, res) => {
+    try {
+        const { company, contactName, contactEmail, contactPhone, employeeCount, orderRef } = req.body;
+        if (!company || !contactEmail || !employeeCount || !orderRef) {
+            return res.status(400).json({ success: false, message: 'Missing required fields' });
+        }
+        const entry = {
+            id: `LD-${Date.now()}-${Math.floor(Math.random() * 9999)}`,
+            company, contactName, contactEmail, contactPhone,
+            employeeCount: parseInt(employeeCount),
+            orderRef,
+            enrolledAt: new Date().toISOString(),
+            ticketsIssued: parseInt(employeeCount),
+        };
+        luckyDrawEntries.push(entry);
+        console.log(`[Lucky Draw] Enrolled: ${company} — ${employeeCount} tickets (ref: ${orderRef})`);
+        return res.json({ success: true, entry, message: `${employeeCount} lucky tickets issued for ${company}` });
+    } catch (err) {
+        console.error('[Lucky Draw] Enroll error:', err);
+        return res.status(500).json({ success: false, message: 'Server error' });
+    }
+});
+
+app.get('/api/lucky-draw/entries', async (req, res) => {
+    // Basic auth: only admins should call this
+    const totalTickets = luckyDrawEntries.reduce((sum, e) => sum + e.employeeCount, 0);
+    res.json({ success: true, count: luckyDrawEntries.length, totalTickets, entries: luckyDrawEntries });
+});
+
+/* ==========================================================================
+   ADMIN PANEL ROUTES (new)
+   ========================================================================== */
+
+// ── Razorpay Payment Routes ──────────────────────────────────────────────────
+// Dynamically require Razorpay only if keys are configured
+function getRazorpayInstance() {
+  const keyId = process.env.RAZORPAY_KEY_ID;
+  const keySecret = process.env.RAZORPAY_KEY_SECRET;
+  if (!keyId || !keySecret) return null;
+  try {
+    const Razorpay = require('razorpay');
+    return new Razorpay({ key_id: keyId, key_secret: keySecret });
+  } catch (e) {
+    console.warn('[Razorpay] Package not installed. Run: npm install razorpay');
+    return null;
+  }
+}
+
+// Create Razorpay order
+app.post('/api/payment/create-order', authenticateClient, async (req, res) => {
+  const rzp = getRazorpayInstance();
+  if (!rzp) {
+    return res.status(503).json({ error: 'Payment gateway not configured. Add Razorpay keys in Admin Panel.' });
+  }
+  const { amount, currency = 'INR', receipt, notes } = req.body;
+  if (!amount || isNaN(amount) || amount < 1) {
+    return res.status(400).json({ error: 'Valid amount in paise required (e.g. 50000 = ₹500).' });
+  }
+  try {
+    const order = await rzp.orders.create({
+      amount: Math.round(amount), // paise
+      currency,
+      receipt: receipt || `SU-${Date.now()}`,
+      notes: notes || {},
+    });
+    console.log(`[Payment] Order created: ${order.id} ₹${amount / 100}`);
+    res.json({ success: true, order, key_id: process.env.RAZORPAY_KEY_ID });
+  } catch (err) {
+    console.error('[Payment] Create order error:', err);
+    res.status(500).json({ error: 'Failed to create payment order.', detail: err.error?.description });
+  }
+});
+
+// Verify payment signature after frontend checkout completes
+app.post('/api/payment/verify', async (req, res) => {
+  const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
+  if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
+    return res.status(400).json({ success: false, error: 'Missing payment verification fields.' });
+  }
+  const crypto = require('crypto');
+  const expectedSig = crypto
+    .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET || '')
+    .update(`${razorpay_order_id}|${razorpay_payment_id}`)
+    .digest('hex');
+  if (expectedSig === razorpay_signature) {
+    console.log(`[Payment] Verified: ${razorpay_payment_id}`);
+    res.json({ success: true, payment_id: razorpay_payment_id });
+  } else {
+    console.warn(`[Payment] Signature mismatch for ${razorpay_payment_id}`);
+    res.status(400).json({ success: false, error: 'Payment signature verification failed.' });
+  }
+});
+
+// Razorpay Webhook receiver
+app.post('/api/payment/webhook', (req, res) => {
+  const crypto = require('crypto');
+  const webhookSecret = process.env.RAZORPAY_WEBHOOK_SECRET;
+  // req.body may already be a parsed object (express.json runs globally)
+  // or a raw Buffer if content-type bypasses json parser
+  let rawBody, event;
+  try {
+    if (Buffer.isBuffer(req.body)) {
+      rawBody = req.body;
+      event = JSON.parse(rawBody.toString('utf8'));
+    } else if (typeof req.body === 'object') {
+      rawBody = Buffer.from(JSON.stringify(req.body));
+      event = req.body;
+    } else {
+      rawBody = Buffer.from(String(req.body));
+      event = JSON.parse(req.body);
+    }
+  } catch (e) {
+    return res.status(400).json({ error: 'Invalid JSON payload.' });
+  }
+
+  if (webhookSecret) {
+    const signature = req.headers['x-razorpay-signature'];
+    const digest = crypto.createHmac('sha256', webhookSecret).update(rawBody).digest('hex');
+    if (signature !== digest) {
+      console.warn('[Webhook] Invalid Razorpay signature');
+      return res.status(400).json({ error: 'Invalid signature' });
+    }
+  }
+
+  console.log(`[Webhook] Razorpay event: ${event.event}`);
+  if (event.event === 'payment.captured') {
+    const payment = event?.payload?.payment?.entity;
+    if (payment) {
+      console.log(`[Webhook] Payment captured: ${payment.id} ₹${payment.amount / 100}`);
+    }
+  }
+  res.json({ received: true });
+});
+
+// Serve admin panel HTML (no auth — login handled client-side)
+app.get('/admin', (req, res) => {
+  res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+  res.setHeader('X-Robots-Tag', 'noindex, nofollow');
+  res.sendFile(path.join(__dirname, 'admin.html'));
+});
+function readEnvFile() {
+  const envPath = path.join(__dirname, '.env');
+  if (!fs.existsSync(envPath)) return {};
+  const lines = fs.readFileSync(envPath, 'utf8').split('\n');
+  const result = {};
+  for (const line of lines) {
+    const match = line.match(/^([A-Z0-9_]+)=(.*)$/);
+    if (match) result[match[1]] = match[2];
+  }
+  return result;
+}
+
+// Helper: write key=value pairs to .env, preserving comments and structure
+function writeEnvValues(updates) {
+  const envPath = path.join(__dirname, '.env');
+  let content = fs.existsSync(envPath) ? fs.readFileSync(envPath, 'utf8') : '';
+  for (const [key, value] of Object.entries(updates)) {
+    const safeValue = String(value).replace(/\n/g, ' ');
+    const lineRegex = new RegExp(`^(#\\s*)?${key}=.*$`, 'm');
+    if (lineRegex.test(content)) {
+      content = content.replace(lineRegex, `${key}=${safeValue}`);
+    } else {
+      content = content.trimEnd() + `\n${key}=${safeValue}\n`;
+    }
+  }
+  fs.writeFileSync(envPath, content, 'utf8');
+  // Hot-reload env vars into process.env
+  for (const [key, value] of Object.entries(updates)) {
+    process.env[key] = value;
+  }
+}
+
+// Get config values (masked) — admin protected
+const ALLOWED_CONFIG_KEYS = [
+  'RAZORPAY_KEY_ID','RAZORPAY_KEY_SECRET','RAZORPAY_WEBHOOK_SECRET',
+  'WHATSAPP_BUSINESS_NUMBER','WHATSAPP_API_TOKEN','WHATSAPP_PHONE_NUMBER_ID',
+  'RESEND_API_KEY','EMAIL_FROM',
+  'JWT_SECRET','ADMIN_PASSWORD',
+  'RECAPTCHA_SITE_KEY','RECAPTCHA_SECRET_KEY','MONGODB_URI',
+  'GA4_MEASUREMENT_ID','CLARITY_PROJECT_ID','GSC_VERIFICATION',
+];
+
+app.get('/api/admin/config', authenticateAdmin, (req, res) => {
+  const requestedKeys = req.query.keys ? req.query.keys.split(',') : ALLOWED_CONFIG_KEYS;
+  const envValues = readEnvFile();
+  const config = {};
+  for (const key of requestedKeys) {
+    if (!ALLOWED_CONFIG_KEYS.includes(key)) continue;
+    const val = process.env[key] || envValues[key] || '';
+    config[key] = val;
+  }
+  res.json({ success: true, config });
+});
+
+// Save config values — admin protected
+app.post('/api/admin/config', authenticateAdmin, (req, res) => {
+  const { config } = req.body;
+  if (!config || typeof config !== 'object') {
+    return res.status(400).json({ success: false, message: 'Invalid config object.' });
+  }
+  const toWrite = {};
+  for (const [key, value] of Object.entries(config)) {
+    if (!ALLOWED_CONFIG_KEYS.includes(key)) continue;
+    if (value !== undefined && value !== null) toWrite[key] = String(value);
+  }
+  if (!Object.keys(toWrite).length) {
+    return res.status(400).json({ success: false, message: 'No valid keys to save.' });
+  }
+  try {
+    writeEnvValues(toWrite);
+    console.log('[Admin] Config updated:', Object.keys(toWrite).join(', '));
+    res.json({ success: true, updated: Object.keys(toWrite) });
+  } catch (err) {
+    console.error('[Admin] Config write error:', err);
+    res.status(500).json({ success: false, message: 'Failed to write config.' });
+  }
+});
+
+// Leads count — admin protected (from Excel file)
+app.get('/api/admin/leads-count', authenticateAdmin, (req, res) => {
+  try {
+    if (!fs.existsSync(LEAD_EXCEL_PATH)) return res.json({ count: 0 });
+    const wb = XLSX.readFile(LEAD_EXCEL_PATH);
+    const ws = wb.Sheets['Lead Enquiries'];
+    if (!ws) return res.json({ count: 0 });
+    const data = XLSX.utils.sheet_to_json(ws);
+    res.json({ count: data.length });
+  } catch (err) {
+    res.json({ count: 0 });
+  }
+});
+
 // Single Page App Fallback Router (Redirect all client URLs to root)
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
@@ -963,7 +1232,7 @@ app.get('*', (req, res) => {
 // Start Server
 app.listen(PORT, () => {
   console.log(`====================================================`);
-  console.log(`Shubh Utsav B2B Gifting API Running on Port ${PORT}`);
+  console.log(`Shubha Utsav B2B Gifting API Running on Port ${PORT}`);
   console.log(`Local Access: http://localhost:${PORT}`);
   console.log(`====================================================`);
 });

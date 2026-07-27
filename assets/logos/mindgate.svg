@@ -1,0 +1,9 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 80">
+  <rect x="6" y="18" width="12" height="50" rx="4" fill="#1B3A7A"/>
+  <rect x="28" y="18" width="12" height="50" rx="4" fill="#1B3A7A"/>
+  <rect x="6" y="18" width="34" height="12" rx="4" fill="#1B3A7A"/>
+  <circle cx="23" cy="52" r="5.5" fill="#4682F0" opacity="0.6"/>
+  <text x="168" y="38" font-family="Arial Black, Arial, sans-serif" font-size="23" font-weight="900" fill="#1B3A7A" text-anchor="middle">MINDGATE</text>
+  <rect x="56" y="45" width="195" height="1.5" fill="#4682F0" rx="1" opacity="0.35"/>
+  <text x="168" y="61" font-family="Arial, sans-serif" font-size="9" fill="#666" text-anchor="middle" letter-spacing="1.5">PAYMENT SOLUTIONS</text>
+</svg>

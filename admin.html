@@ -1,0 +1,992 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shubha Utsav — Admin Portal</title>
+  <meta name="robots" content="noindex, nofollow">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0f1117; --card: #1a1d27; --border: #2a2d3e;
+      --accent: #D4AF37; --text: #e2e8f0; --muted: #94a3b8;
+      --danger: #ef4444; --success: #22c55e; --info: #3b82f6; --warn: #f59e0b;
+      --sidebar: #13151f; --inp: #252836; --rad: 10px;
+    }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+    /* ── LOGIN ── */
+    #login-page { display: flex; align-items: center; justify-content: center; min-height: 100vh; background: radial-gradient(ellipse at 50% 0%, #2a1f00 0%, var(--bg) 70%); }
+    .login-box { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 48px 40px; width: 100%; max-width: 420px; text-align: center; box-shadow: 0 24px 64px rgba(0,0,0,.5); }
+    .login-box h1 { font-size: 1.4rem; color: var(--accent); margin-bottom: 4px; }
+    .login-box p { color: var(--muted); font-size: .85rem; margin-bottom: 28px; }
+    .login-box input { width: 100%; padding: 12px 16px; background: var(--inp); border: 1px solid var(--border); border-radius: var(--rad); color: var(--text); font-size: 1rem; margin-bottom: 12px; }
+    .login-box input:focus { outline: none; border-color: var(--accent); }
+    #login-error { color: var(--danger); font-size: .85rem; margin-top: 10px; display: none; }
+
+    /* ── BUTTONS ── */
+    .btn { display: inline-flex; align-items: center; gap: 8px; padding: 11px 22px; border: none; border-radius: var(--rad); font-size: .88rem; font-weight: 600; cursor: pointer; transition: opacity .2s, transform .1s; text-decoration: none; }
+    .btn:hover { opacity: .85; } .btn:active { transform: scale(.97); }
+    .btn-primary { background: var(--accent); color: #000; }
+    .btn-full { width: 100%; justify-content: center; }
+    .btn-sm { padding: 7px 14px; font-size: .78rem; }
+    .btn-danger { background: var(--danger); color: #fff; }
+    .btn-success { background: var(--success); color: #fff; }
+    .btn-info { background: var(--info); color: #fff; }
+    .btn-warn { background: var(--warn); color: #000; }
+    .btn-ghost { background: transparent; color: var(--muted); border: 1px solid var(--border); }
+
+    /* ── LAYOUT ── */
+    #dashboard { display: none; flex-direction: row; min-height: 100vh; }
+    .sidebar { width: 234px; min-width: 234px; background: var(--sidebar); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: sticky; top: 0; height: 100vh; overflow-y: auto; }
+    .sidebar-logo { padding: 20px 18px 18px; border-bottom: 1px solid var(--border); }
+    .sidebar-logo .su { font-size: 1.5rem; }
+    .sidebar-logo h2 { font-size: .85rem; color: var(--accent); margin-top: 4px; line-height: 1.3; }
+    .sidebar-logo small { color: var(--muted); font-size: .7rem; }
+    .nav-group { padding: 16px 10px 4px; }
+    .nav-label { color: var(--muted); font-size: .65rem; text-transform: uppercase; letter-spacing: 1px; padding: 0 8px; margin-bottom: 5px; }
+    .nav-item { display: flex; align-items: center; gap: 9px; padding: 9px 10px; border-radius: 8px; cursor: pointer; color: var(--muted); font-size: .84rem; transition: background .15s, color .15s; }
+    .nav-item:hover { background: rgba(212,175,55,.08); color: var(--text); }
+    .nav-item.active { background: rgba(212,175,55,.16); color: var(--accent); font-weight: 600; }
+    .nav-item .ic { font-size: .95rem; width: 20px; text-align: center; }
+    .sidebar-footer { margin-top: auto; padding: 14px 16px; border-top: 1px solid var(--border); }
+    .main { flex: 1; overflow-y: auto; }
+    .topbar { display: flex; align-items: center; justify-content: space-between; padding: 14px 26px; background: var(--card); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 10; }
+    .topbar h1 { font-size: 1rem; font-weight: 600; }
+    .topbar-r { display: flex; gap: 10px; align-items: center; font-size: .82rem; }
+    .dot-green { width: 8px; height: 8px; border-radius: 50%; background: var(--success); display: inline-block; margin-right: 5px; }
+    .content { padding: 22px 26px; }
+
+    /* ── CARDS ── */
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: var(--rad); padding: 22px; margin-bottom: 18px; }
+    .card-hd { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 18px; flex-wrap: wrap; gap: 10px; }
+    .card-title { font-size: .92rem; font-weight: 700; }
+    .card-sub { font-size: .77rem; color: var(--muted); margin-top: 3px; }
+    .badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: .7rem; font-weight: 700; }
+    .badge-gold { background: rgba(212,175,55,.15); color: var(--accent); border: 1px solid rgba(212,175,55,.3); }
+    .badge-green { background: rgba(34,197,94,.12); color: var(--success); border: 1px solid rgba(34,197,94,.3); }
+    .badge-red { background: rgba(239,68,68,.12); color: var(--danger); border: 1px solid rgba(239,68,68,.3); }
+    .badge-blue { background: rgba(59,130,246,.12); color: var(--info); border: 1px solid rgba(59,130,246,.3); }
+    .badge-warn { background: rgba(245,158,11,.12); color: var(--warn); border: 1px solid rgba(245,158,11,.3); }
+
+    /* ── STATS ── */
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px,1fr)); gap: 14px; margin-bottom: 20px; }
+    .stat-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--rad); padding: 18px; text-align: center; }
+    .stat-val { font-size: 1.9rem; font-weight: 800; color: var(--accent); }
+    .stat-label { font-size: .74rem; color: var(--muted); margin-top: 4px; }
+
+    /* ── SECTION VISIBILITY ── */
+    .section { display: none; }
+    .section.active { display: block; }
+
+    /* ── TABLE ── */
+    .tbl-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: .82rem; }
+    th { text-align: left; padding: 9px 12px; background: rgba(255,255,255,.03); color: var(--muted); font-size: .68rem; text-transform: uppercase; letter-spacing: .7px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+    td { padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,.04); vertical-align: top; }
+    tr:hover td { background: rgba(255,255,255,.02); }
+    .empty { text-align: center; padding: 40px; color: var(--muted); }
+    .empty .ei { font-size: 2.5rem; margin-bottom: 10px; }
+
+    /* ── FORM FIELDS ── */
+    .cfg-group { margin-bottom: 24px; }
+    .cfg-group-title { font-size: .75rem; font-weight: 800; text-transform: uppercase; letter-spacing: .8px; color: var(--accent); margin-bottom: 12px; padding-bottom: 7px; border-bottom: 1px solid var(--border); }
+    .field-row { display: grid; grid-template-columns: 180px 1fr; gap: 12px; align-items: start; margin-bottom: 10px; }
+    .field-lbl { font-size: .83rem; color: var(--muted); padding-top: 11px; }
+    .field-req { color: var(--danger); }
+    .fi { display: flex; gap: 7px; }
+    .fi input, .fi select, textarea.fi-ta {
+      flex: 1; padding: 10px 13px; background: var(--inp); border: 1px solid var(--border);
+      border-radius: 8px; color: var(--text); font-size: .85rem; font-family: 'Courier New', monospace;
+    }
+    .fi input:focus, .fi select:focus, textarea.fi-ta:focus { outline: none; border-color: var(--accent); }
+    .fi input[type="password"] { letter-spacing: 2px; }
+    textarea.fi-ta { font-family: inherit; resize: vertical; min-height: 80px; letter-spacing: normal; }
+    .rev-btn { background: var(--border); border: none; color: var(--muted); padding: 10px 13px; border-radius: 8px; cursor: pointer; font-size: .82rem; white-space: nowrap; }
+    .rev-btn:hover { color: var(--text); }
+    .field-hint { font-size: .71rem; color: var(--muted); grid-column: 2/-1; margin-top: -4px; line-height: 1.4; }
+    .search-bar { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+    .search-bar input, .search-bar select { padding: 8px 12px; background: var(--inp); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: .83rem; }
+    .search-bar input { flex: 1; min-width: 160px; }
+
+    /* ── MODAL ── */
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.7); z-index: 999; align-items: center; justify-content: center; }
+    .modal-overlay.open { display: flex; }
+    .modal-box { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 28px; width: 100%; max-width: 540px; max-height: 90vh; overflow-y: auto; position: relative; }
+    .modal-close { position: absolute; top: 14px; right: 16px; background: none; border: none; color: var(--muted); font-size: 1.4rem; cursor: pointer; }
+    .modal-close:hover { color: var(--text); }
+
+    /* ── SPINNER ── */
+    .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,.2); border-top-color: var(--accent); border-radius: 50%; animation: spin .6s linear infinite; vertical-align: middle; margin-right: 5px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── TOAST ── */
+    #toast { position: fixed; bottom: 22px; right: 22px; background: var(--card); border: 1px solid var(--border); border-radius: var(--rad); padding: 13px 18px; font-size: .86rem; transform: translateY(100px); opacity: 0; transition: transform .3s, opacity .3s; z-index: 9999; max-width: 340px; }
+    #toast.show { transform: translateY(0); opacity: 1; }
+    #toast.success { border-color: var(--success); }
+    #toast.error { border-color: var(--danger); }
+    #toast.warn { border-color: var(--warn); }
+
+    /* ── WA PREVIEW ── */
+    .wa-msg-box { background: #075e54; border-radius: 10px; padding: 14px; margin-top: 10px; }
+    .wa-bubble { background: #dcf8c6; color: #111; border-radius: 8px 8px 8px 0; padding: 10px 13px; font-size: .83rem; line-height: 1.6; max-width: 300px; white-space: pre-wrap; }
+
+    /* ── INVOICE FRAME ── */
+    #invoice-frame { width: 100%; height: 70vh; border: none; background: #fff; border-radius: 8px; }
+
+    /* ── CHECKLIST ── */
+    .check-row { display: flex; align-items: center; gap: 10px; padding: 7px 0; border-bottom: 1px solid var(--border); font-size: .83rem; }
+
+    @media (max-width: 768px) {
+      .sidebar { display: none; }
+      .field-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════
+     LOGIN
+════════════════════════════════════════════════════ -->
+<div id="login-page">
+  <div class="login-box">
+    <div style="font-size:2.2rem;margin-bottom:6px;">🪔</div>
+    <h1>Enterprise Admin Portal</h1>
+    <p>Access restricted to authorised personnel only.</p>
+    <input type="text" id="l-user" placeholder="Username" autocomplete="username">
+    <input type="password" id="l-pass" placeholder="Password" autocomplete="current-password">
+    <button class="btn btn-primary btn-full" onclick="doLogin()">🔐 Authenticate Session</button>
+    <div id="login-error">Invalid credentials. Please try again.</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     DASHBOARD
+════════════════════════════════════════════════════ -->
+<div id="dashboard">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="su">🪔</div>
+      <h2>Shubha Utsav<br>Admin Portal</h2>
+      <small>Enterprise v2.0</small>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-label">Overview</div>
+      <div class="nav-item active" onclick="nav('overview',this)"><span class="ic">📊</span> Dashboard</div>
+    </div>
+    <div class="nav-group">
+      <div class="nav-label">Business Data</div>
+      <div class="nav-item" onclick="nav('leads',this)"><span class="ic">👥</span> Lead Enquiries</div>
+      <div class="nav-item" onclick="nav('orders',this)"><span class="ic">📦</span> Orders</div>
+      <div class="nav-item" onclick="nav('lucky-draw',this)"><span class="ic">🎟️</span> Lucky Draw</div>
+    </div>
+    <div class="nav-group">
+      <div class="nav-label">Configuration</div>
+      <div class="nav-item" onclick="nav('razorpay',this)"><span class="ic">💳</span> Razorpay</div>
+      <div class="nav-item" onclick="nav('whatsapp',this)"><span class="ic">💬</span> WhatsApp</div>
+      <div class="nav-item" onclick="nav('email',this)"><span class="ic">📧</span> Email / SMTP</div>
+      <div class="nav-item" onclick="nav('security',this)"><span class="ic">🔒</span> Security & Auth</div>
+      <div class="nav-item" onclick="nav('seo',this)"><span class="ic">🔍</span> SEO & Analytics</div>
+    </div>
+
+    <div class="sidebar-footer">
+      <button class="btn btn-ghost btn-sm" style="width:100%;justify-content:center;" onclick="doLogout()">🚪 Sign Out</button>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <div class="main">
+    <div class="topbar">
+      <h1 id="pg-title">📊 Dashboard</h1>
+      <div class="topbar-r">
+        <span><span class="dot-green"></span>Server Live</span>
+        <button class="btn btn-ghost btn-sm" onclick="refreshCurrent()">↺ Refresh</button>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- ── DASHBOARD ── -->
+      <div id="section-overview" class="section active">
+        <div class="stats-grid" id="metrics-grid">
+          <div class="stat-card"><div class="stat-val" id="m-leads">—</div><div class="stat-label">Total Leads</div></div>
+          <div class="stat-card"><div class="stat-val" id="m-verified">—</div><div class="stat-label">Verified Leads</div></div>
+          <div class="stat-card"><div class="stat-val" id="m-orders">—</div><div class="stat-label">Total Orders</div></div>
+          <div class="stat-card"><div class="stat-val" id="m-revenue">—</div><div class="stat-label">Revenue (₹)</div></div>
+          <div class="stat-card"><div class="stat-val" id="m-conv">—</div><div class="stat-label">Conversion %</div></div>
+          <div class="stat-card"><div class="stat-val" id="m-ld">—</div><div class="stat-label">Lucky Tickets</div></div>
+        </div>
+
+        <div class="card">
+          <div class="card-hd"><div><div class="card-title">🚀 Pre-Launch Checklist</div><div class="card-sub">Complete before going live</div></div></div>
+          <div id="checklist-body">Loading…</div>
+        </div>
+
+        <div class="card">
+          <div class="card-hd"><div class="card-title">⚡ Quick Actions</div></div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;">
+            <button class="btn btn-info btn-sm" onclick="nav('leads',document.querySelector('[onclick*=leads]'))">View Leads</button>
+            <button class="btn btn-warn btn-sm" onclick="nav('orders',document.querySelector('[onclick*=orders]'))">View Orders</button>
+            <a href="/api/admin/export/leads" class="btn btn-success btn-sm" id="export-leads-link" target="_blank">⬇ Export Leads XLS</a>
+            <a href="/api/admin/export/orders" class="btn btn-ghost btn-sm" id="export-orders-link" target="_blank">⬇ Export Orders XLS</a>
+            <a href="/api/admin/download/lead-enquiries" class="btn btn-ghost btn-sm" id="dl-leads-link" target="_blank">⬇ Lead Enquiries Workbook</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── LEADS ── -->
+      <div id="section-leads" class="section">
+        <div class="card">
+          <div class="card-hd">
+            <div><div class="card-title">👥 Lead Enquiries</div><div class="card-sub" id="leads-sub">Loading…</div></div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+              <a href="/api/admin/export/leads" class="btn btn-success btn-sm" id="leads-export-btn" target="_blank">⬇ Export Excel</a>
+              <a href="/api/admin/download/lead-enquiries" class="btn btn-ghost btn-sm" target="_blank">⬇ Workbook</a>
+              <button class="btn btn-ghost btn-sm" onclick="loadLeads()">↺ Refresh</button>
+            </div>
+          </div>
+          <div class="search-bar">
+            <input type="text" id="lead-search" placeholder="Search name, company, email…" oninput="loadLeads()">
+            <select id="lead-city" onchange="loadLeads()">
+              <option value="">All Cities</option>
+              <option>Pune</option><option>Mumbai</option><option>Nagpur</option>
+              <option>Hyderabad</option><option>Bengaluru</option><option>Jaipur</option>
+              <option>Surat</option><option>Kolkata</option><option>Kolhapur</option>
+            </select>
+            <select id="lead-status" onchange="loadLeads()">
+              <option value="">All Statuses</option>
+              <option>Verified</option><option>Pending</option><option>Rejected</option>
+            </select>
+          </div>
+          <div class="tbl-wrap">
+            <table>
+              <thead><tr><th>Lead ID</th><th>Company</th><th>Name</th><th>Email</th><th>Phone</th><th>City</th><th>Employees</th><th>Status</th><th>Date</th></tr></thead>
+              <tbody id="leads-tbody"><tr><td colspan="9"><div class="empty"><span class="spinner"></span> Loading…</div></td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── ORDERS ── -->
+      <div id="section-orders" class="section">
+        <div class="card">
+          <div class="card-hd">
+            <div><div class="card-title">📦 Orders</div><div class="card-sub" id="orders-sub">Loading…</div></div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+              <a href="/api/admin/export/orders" class="btn btn-success btn-sm" id="orders-export-btn" target="_blank">⬇ Export Excel</a>
+              <button class="btn btn-ghost btn-sm" onclick="loadOrders()">↺ Refresh</button>
+            </div>
+          </div>
+          <div class="search-bar">
+            <input type="text" id="order-search" placeholder="Search order ID, company…" oninput="loadOrders()">
+            <select id="order-status" onchange="loadOrders()">
+              <option value="">All Order Statuses</option>
+              <option>Pending</option><option>Confirmed</option><option>In Production</option>
+              <option>Dispatched</option><option>Delivered</option><option>Closed</option>
+            </select>
+            <select id="order-payment" onchange="loadOrders()">
+              <option value="">All Payment Statuses</option>
+              <option>Unpaid</option><option>Advance Paid</option><option>Paid</option><option>Refunded</option>
+            </select>
+          </div>
+          <div class="tbl-wrap">
+            <table>
+              <thead><tr><th>Order ID</th><th>Company</th><th>Contact</th><th>Employees</th><th>Amount</th><th>Order Status</th><th>Payment</th><th>Delivery</th><th>Actions</th></tr></thead>
+              <tbody id="orders-tbody"><tr><td colspan="9"><div class="empty"><span class="spinner"></span> Loading…</div></td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── LUCKY DRAW ── -->
+      <div id="section-lucky-draw" class="section">
+        <div class="card">
+          <div class="card-hd">
+            <div><div class="card-title">🎟️ Lucky Draw</div><div class="card-sub" id="ld-sub">Loading…</div></div>
+            <button class="btn btn-ghost btn-sm" onclick="loadLD()">↺ Refresh</button>
+          </div>
+          <div class="stats-grid" style="margin-bottom:16px;">
+            <div class="stat-card"><div class="stat-val" id="ld-cos">—</div><div class="stat-label">Companies</div></div>
+            <div class="stat-card"><div class="stat-val" id="ld-tix">—</div><div class="stat-label">Total Tickets</div></div>
+          </div>
+          <div class="tbl-wrap">
+            <table>
+              <thead><tr><th>Company</th><th>Contact</th><th>Email</th><th>Employees</th><th>Tickets</th><th>Order Ref</th><th>Enrolled</th></tr></thead>
+              <tbody id="ld-tbody"><tr><td colspan="7"><div class="empty"><span class="spinner"></span> Loading…</div></td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── RAZORPAY ── -->
+      <div id="section-razorpay" class="section">
+        <div class="card">
+          <div class="card-hd">
+            <div><div class="card-title">💳 Razorpay Payment Gateway</div><div class="card-sub">API credentials — stored securely in .env</div></div>
+            <a href="https://dashboard.razorpay.com/app/keys" target="_blank" class="btn btn-info btn-sm">Razorpay Dashboard ↗</a>
+          </div>
+          <div class="cfg-group">
+            <div class="cfg-group-title">API Keys</div>
+            <div class="field-row"><label class="field-lbl">Key ID <span class="field-req">*</span></label><div class="fi"><input type="password" id="cfg-RAZORPAY_KEY_ID" placeholder="rzp_live_XXXXXXXXXXXX"><button class="rev-btn" onclick="rev('cfg-RAZORPAY_KEY_ID')">👁</button></div></div>
+            <div class="field-hint">Settings → API Keys in Razorpay Dashboard</div>
+            <div class="field-row"><label class="field-lbl">Key Secret <span class="field-req">*</span></label><div class="fi"><input type="password" id="cfg-RAZORPAY_KEY_SECRET" placeholder="XXXXXXXXXXXXXXXXXXXXXXXX"><button class="rev-btn" onclick="rev('cfg-RAZORPAY_KEY_SECRET')">👁</button></div></div>
+            <div class="field-hint">Never expose this in frontend code</div>
+            <div class="field-row"><label class="field-lbl">Webhook Secret</label><div class="fi"><input type="password" id="cfg-RAZORPAY_WEBHOOK_SECRET" placeholder="webhook_secret"><button class="rev-btn" onclick="rev('cfg-RAZORPAY_WEBHOOK_SECRET')">👁</button></div></div>
+            <div class="field-hint">Webhook endpoint: <code>https://yourdomain.com/api/payment/webhook</code></div>
+          </div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;">
+            <button class="btn btn-primary" onclick="saveCfg(['RAZORPAY_KEY_ID','RAZORPAY_KEY_SECRET','RAZORPAY_WEBHOOK_SECRET'])">💾 Save</button>
+            <button class="btn btn-ghost btn-sm" onclick="loadCfg(['RAZORPAY_KEY_ID','RAZORPAY_KEY_SECRET','RAZORPAY_WEBHOOK_SECRET'])">↺ Reload</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title" style="margin-bottom:12px;">📋 Razorpay Setup Steps</div>
+          <ul style="color:var(--muted);font-size:.83rem;padding-left:18px;line-height:2.2;">
+            <li>Generate keys: Razorpay Dashboard → Settings → API Keys (use Test for dev)</li>
+            <li>Paste Key ID + Key Secret above → Save</li>
+            <li>Add Webhook URL → <code>/api/payment/webhook</code></li>
+            <li>Enable UPI, Cards, Net Banking, Wallets</li>
+            <li>Add bank account for settlements + complete KYC</li>
+            <li>Switch to Live keys before going live</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- ── WHATSAPP ── -->
+      <div id="section-whatsapp" class="section">
+        <div class="card">
+          <div class="card-hd">
+            <div><div class="card-title">💬 WhatsApp Business</div><div class="card-sub">Click-to-chat config + Ad message preview</div></div>
+            <a href="https://business.whatsapp.com/" target="_blank" class="btn btn-success btn-sm">WA Business ↗</a>
+          </div>
+          <div class="cfg-group">
+            <div class="cfg-group-title">Business Number</div>
+            <div class="field-row"><label class="field-lbl">Phone <span class="field-req">*</span></label><div class="fi"><input type="text" id="cfg-WHATSAPP_BUSINESS_NUMBER" placeholder="919876543210" oninput="updateWaLink()" style="font-family:inherit;"></div></div>
+            <div class="field-hint">Country code + number, no + or spaces. E.g. 919876543210</div>
+          </div>
+          <div class="cfg-group">
+            <div class="cfg-group-title">WhatsApp Cloud API (optional)</div>
+            <div class="field-row"><label class="field-lbl">API Token</label><div class="fi"><input type="password" id="cfg-WHATSAPP_API_TOKEN" placeholder="EAAxxxxxxxxxx"><button class="rev-btn" onclick="rev('cfg-WHATSAPP_API_TOKEN')">👁</button></div></div>
+            <div class="field-row"><label class="field-lbl">Phone Number ID</label><div class="fi"><input type="text" id="cfg-WHATSAPP_PHONE_NUMBER_ID" placeholder="123456789" style="font-family:inherit;"></div></div>
+          </div>
+          <button class="btn btn-primary" onclick="saveCfg(['WHATSAPP_BUSINESS_NUMBER','WHATSAPP_API_TOKEN','WHATSAPP_PHONE_NUMBER_ID'])">💾 Save WhatsApp Config</button>
+        </div>
+        <div class="card">
+          <div class="card-title" style="margin-bottom:14px;">📢 Ad Message Preview</div>
+          <div style="display:flex;gap:20px;flex-wrap:wrap;">
+            <div style="flex:1;min-width:240px;">
+              <textarea class="fi-ta" id="wa-msg" style="width:100%;height:130px;">🪔 *Shubha Utsav — Corporate Diwali Gifting 2026*
+
+✨ India's First Hyperlocal Gifting Platform
+🎁 Authentic city hampers — Pune, Mumbai, Nagpur & more
+🏭 500–10,000 employee gifting solutions
+🖨️ Custom logo branding included
+
+👉 https://shubhautsav.com</textarea>
+              <button class="btn btn-ghost btn-sm" style="margin-top:8px;" onclick="updateWaPreview()">🔄 Update Preview</button>
+            </div>
+            <div style="min-width:240px;">
+              <div style="font-size:.78rem;color:var(--muted);margin-bottom:6px;">Live preview:</div>
+              <div class="wa-msg-box"><div class="wa-bubble" id="wa-preview">Loading preview…</div></div>
+              <div id="wa-link" style="margin-top:10px;font-size:.78rem;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── EMAIL ── -->
+      <div id="section-email" class="section">
+        <div class="card">
+          <div class="card-hd">
+            <div><div class="card-title">📧 Email (Resend)</div><div class="card-sub">Transactional email for lead confirmations</div></div>
+            <a href="https://resend.com/api-keys" target="_blank" class="btn btn-info btn-sm">Resend ↗</a>
+          </div>
+          <div class="cfg-group">
+            <div class="cfg-group-title">Resend API</div>
+            <div class="field-row"><label class="field-lbl">API Key <span class="field-req">*</span></label><div class="fi"><input type="password" id="cfg-RESEND_API_KEY" placeholder="re_XXXXXXXXXXXX"><button class="rev-btn" onclick="rev('cfg-RESEND_API_KEY')">👁</button></div></div>
+            <div class="field-hint">Free tier: 3,000 emails/month. Generate at resend.com → API Keys</div>
+            <div class="field-row"><label class="field-lbl">From Email</label><div class="fi"><input type="text" id="cfg-EMAIL_FROM" placeholder="noreply@shubhautsav.com" style="font-family:inherit;"></div></div>
+            <div class="field-hint">Must be a verified domain in Resend (add DNS TXT records)</div>
+          </div>
+          <button class="btn btn-primary" onclick="saveCfg(['RESEND_API_KEY','EMAIL_FROM'])">💾 Save Email Config</button>
+        </div>
+      </div>
+
+      <!-- ── SECURITY ── -->
+      <div id="section-security" class="section">
+        <div class="card">
+          <div class="card-hd"><div class="card-title">🔒 Security & Authentication</div></div>
+          <div class="cfg-group">
+            <div class="cfg-group-title">Admin Credentials</div>
+            <div class="field-row"><label class="field-lbl">Admin Username</label><div class="fi"><input type="text" id="cfg-ADMIN_USERNAME" placeholder="admin" style="font-family:inherit;"></div></div>
+            <div class="field-row"><label class="field-lbl">Admin Password <span class="field-req">*</span></label><div class="fi"><input type="password" id="cfg-ADMIN_PASSWORD" placeholder="New password (min 12 chars)"><button class="rev-btn" onclick="rev('cfg-ADMIN_PASSWORD')">👁</button></div></div>
+            <div class="field-hint">⚠️ Changing password requires server restart to take effect.</div>
+          </div>
+          <div class="cfg-group">
+            <div class="cfg-group-title">JWT</div>
+            <div class="field-row"><label class="field-lbl">JWT Secret <span class="field-req">*</span></label><div class="fi"><input type="password" id="cfg-JWT_SECRET" placeholder="min 32 char random string"><button class="rev-btn" onclick="rev('cfg-JWT_SECRET')">👁</button></div></div>
+            <div class="field-hint">Changing this invalidates all active sessions.</div>
+          </div>
+          <div class="cfg-group">
+            <div class="cfg-group-title">Google reCAPTCHA v3</div>
+            <div class="field-row"><label class="field-lbl">Site Key</label><div class="fi"><input type="text" id="cfg-RECAPTCHA_SITE_KEY" placeholder="6LeXXXXXXXXXX" style="font-family:inherit;"></div></div>
+            <div class="field-row"><label class="field-lbl">Secret Key</label><div class="fi"><input type="password" id="cfg-RECAPTCHA_SECRET_KEY" placeholder="6LeXXXXXXXXXX"><button class="rev-btn" onclick="rev('cfg-RECAPTCHA_SECRET_KEY')">👁</button></div></div>
+            <div class="field-hint"><a href="https://www.google.com/recaptcha/admin" target="_blank" style="color:var(--info)">google.com/recaptcha/admin</a></div>
+          </div>
+          <div class="cfg-group">
+            <div class="cfg-group-title">Database</div>
+            <div class="field-row"><label class="field-lbl">MongoDB URI</label><div class="fi"><input type="password" id="cfg-MONGODB_URI" placeholder="mongodb+srv://user:pass@cluster.mongodb.net/db"><button class="rev-btn" onclick="rev('cfg-MONGODB_URI')">👁</button></div></div>
+            <div class="field-hint">Free: <a href="https://cloud.mongodb.com" target="_blank" style="color:var(--info)">MongoDB Atlas M0</a></div>
+          </div>
+          <button class="btn btn-primary" onclick="saveCfg(['ADMIN_USERNAME','ADMIN_PASSWORD','JWT_SECRET','RECAPTCHA_SITE_KEY','RECAPTCHA_SECRET_KEY','MONGODB_URI'])">💾 Save Security Config</button>
+        </div>
+      </div>
+
+      <!-- ── SEO ── -->
+      <div id="section-seo" class="section">
+        <div class="card">
+          <div class="card-hd"><div class="card-title">🔍 SEO & Analytics</div></div>
+          <div class="cfg-group">
+            <div class="cfg-group-title">Analytics</div>
+            <div class="field-row"><label class="field-lbl">GA4 ID</label><div class="fi"><input type="text" id="cfg-GA4_MEASUREMENT_ID" placeholder="G-XXXXXXXXXX" style="font-family:inherit;"></div></div>
+            <div class="field-hint">Replace <code>G-SEO1234567</code> placeholder in index.html</div>
+            <div class="field-row"><label class="field-lbl">Clarity Project ID</label><div class="fi"><input type="text" id="cfg-CLARITY_PROJECT_ID" placeholder="xxxxxxxxxx" style="font-family:inherit;"></div></div>
+          </div>
+          <div class="cfg-group">
+            <div class="cfg-group-title">Search Console</div>
+            <div class="field-row"><label class="field-lbl">GSC Verification</label><div class="fi"><input type="text" id="cfg-GSC_VERIFICATION" placeholder="google_verification_token" style="font-family:inherit;"></div></div>
+          </div>
+          <button class="btn btn-primary" onclick="saveCfg(['GA4_MEASUREMENT_ID','CLARITY_PROJECT_ID','GSC_VERIFICATION'])">💾 Save SEO Config</button>
+        </div>
+        <div class="card">
+          <div class="card-title" style="margin-bottom:12px;">🌐 SEO Routes Available</div>
+          <ul style="color:var(--muted);font-size:.83rem;line-height:2.2;padding-left:18px;">
+            <li><a href="/robots.txt" target="_blank" style="color:var(--info)">/robots.txt</a> — Search engine crawler rules</li>
+            <li><a href="/sitemap.xml" target="_blank" style="color:var(--info)">/sitemap.xml</a> — Full sitemap (auto-generated)</li>
+            <li><a href="/blog" target="_blank" style="color:var(--info)">/blog</a> — Blog directory</li>
+            <li><a href="/corporate-gifting-pune" target="_blank" style="color:var(--info)">/corporate-gifting-pune</a> — City landing pages</li>
+          </ul>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /main -->
+</div><!-- /dashboard -->
+
+<!-- ── ORDER EDIT MODAL ── -->
+<div class="modal-overlay" id="order-modal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeOrderModal()">×</button>
+    <h3 style="margin-bottom:16px;color:var(--accent);">📦 Manage Order — <span id="om-id"></span></h3>
+    <div class="cfg-group">
+      <div class="cfg-group-title">Update Status</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px;">
+        <div>
+          <label style="font-size:.75rem;color:var(--muted);display:block;margin-bottom:4px;">Order Status</label>
+          <select id="om-order-status" style="width:100%;padding:9px;background:var(--inp);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:.83rem;">
+            <option>Pending</option><option>Confirmed</option><option>In Production</option>
+            <option>Dispatched</option><option>Delivered</option><option>Closed</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:.75rem;color:var(--muted);display:block;margin-bottom:4px;">Payment Status</label>
+          <select id="om-payment-status" style="width:100%;padding:9px;background:var(--inp);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:.83rem;">
+            <option>Unpaid</option><option>Advance Paid</option><option>Paid</option><option>Refunded</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:.75rem;color:var(--muted);display:block;margin-bottom:4px;">Delivery Status</label>
+          <select id="om-delivery-status" style="width:100%;padding:9px;background:var(--inp);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:.83rem;">
+            <option>Not Started</option><option>Packing</option><option>Dispatched</option>
+            <option>Out for Delivery</option><option>Delivered</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn btn-primary btn-sm" onclick="saveOrderStatus()">💾 Update Status</button>
+    </div>
+    <div class="cfg-group">
+      <div class="cfg-group-title">Internal Note</div>
+      <textarea class="fi-ta" id="om-note" placeholder="Add internal note for this order…" style="width:100%;"></textarea>
+      <button class="btn btn-warn btn-sm" style="margin-top:8px;" onclick="addOrderNote()">➕ Add Note</button>
+    </div>
+    <div id="om-notes-list" style="margin-top:8px;font-size:.8rem;color:var(--muted);"></div>
+    <div class="cfg-group" style="margin-top:4px;">
+      <div class="cfg-group-title">Invoice</div>
+      <button class="btn btn-ghost btn-sm" onclick="openInvoice()">🖨️ View / Print Invoice</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── INVOICE MODAL ── -->
+<div class="modal-overlay" id="invoice-modal">
+  <div class="modal-box" style="max-width:820px;width:95%;">
+    <button class="modal-close" onclick="document.getElementById('invoice-modal').classList.remove('open')">×</button>
+    <iframe id="invoice-frame" src="about:blank"></iframe>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+/* ======================================================
+   STATE
+====================================================== */
+let TOKEN = sessionStorage.getItem('su_admin_tok') || null;
+let AUTH_HDR = () => ({ 'Authorization': 'Bearer ' + TOKEN });
+let currentOrderId = null;
+
+const ALLOWED_CFG_KEYS = [
+  'RAZORPAY_KEY_ID','RAZORPAY_KEY_SECRET','RAZORPAY_WEBHOOK_SECRET',
+  'WHATSAPP_BUSINESS_NUMBER','WHATSAPP_API_TOKEN','WHATSAPP_PHONE_NUMBER_ID',
+  'RESEND_API_KEY','EMAIL_FROM',
+  'ADMIN_USERNAME','ADMIN_PASSWORD','JWT_SECRET',
+  'RECAPTCHA_SITE_KEY','RECAPTCHA_SECRET_KEY','MONGODB_URI',
+  'GA4_MEASUREMENT_ID','CLARITY_PROJECT_ID','GSC_VERIFICATION'
+];
+
+/* ======================================================
+   AUTH
+====================================================== */
+async function doLogin() {
+  const user = document.getElementById('l-user').value.trim();
+  const pass = document.getElementById('l-pass').value;
+  if (!pass) return;
+  const btn = document.querySelector('#login-page .btn-primary');
+  btn.textContent = 'Authenticating…';
+  document.getElementById('login-error').style.display = 'none';
+  try {
+    const r = await fetch('/api/admin/login', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username: user || undefined, password: pass })
+    });
+    const d = await r.json();
+    if (r.ok && d.token) {
+      TOKEN = d.token;
+      sessionStorage.setItem('su_admin_tok', TOKEN);
+      showDashboard();
+    } else {
+      document.getElementById('login-error').style.display = 'block';
+    }
+  } catch (e) { toast('Connection error — is the server running?', 'error'); }
+  btn.textContent = '🔐 Authenticate Session';
+}
+
+function doLogout() {
+  sessionStorage.removeItem('su_admin_tok');
+  TOKEN = null;
+  document.getElementById('dashboard').style.display = 'none';
+  document.getElementById('login-page').style.display = 'flex';
+}
+
+document.getElementById('l-pass').addEventListener('keypress', e => { if (e.key === 'Enter') doLogin(); });
+document.getElementById('l-user').addEventListener('keypress', e => { if (e.key === 'Enter') doLogin(); });
+
+if (TOKEN) showDashboard();
+
+function showDashboard() {
+  document.getElementById('login-page').style.display = 'none';
+  document.getElementById('dashboard').style.display = 'flex';
+  loadMetrics();
+  loadAllConfig();
+  updateWaPreview();
+  injectAuthLinks();
+}
+
+function injectAuthLinks() {
+  // Inject token into Excel export links so they pass auth header (open in new tab doesn't send header)
+  // Instead we'll redirect through a bearer-enabled fetch
+  ['export-leads-link','export-orders-link','dl-leads-link','leads-export-btn','orders-export-btn'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      const href = el.getAttribute('href');
+      el.onclick = (e) => { e.preventDefault(); downloadWithAuth(href, el.getAttribute('href').split('/').pop() + '.xlsx'); };
+    }
+  });
+}
+
+async function downloadWithAuth(url, filename) {
+  try {
+    const r = await fetch(url, { headers: AUTH_HDR() });
+    if (!r.ok) { toast('Export failed — check server logs', 'error'); return; }
+    const blob = await r.blob();
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    a.click();
+  } catch (e) { toast('Download error: ' + e.message, 'error'); }
+}
+
+/* ======================================================
+   NAVIGATION
+====================================================== */
+const TITLES = {
+  overview:'📊 Dashboard', leads:'👥 Lead Enquiries', orders:'📦 Orders',
+  'lucky-draw':'🎟️ Lucky Draw', razorpay:'💳 Razorpay', whatsapp:'💬 WhatsApp',
+  email:'📧 Email / SMTP', security:'🔒 Security & Auth', seo:'🔍 SEO & Analytics'
+};
+let currentSection = 'overview';
+
+function nav(name, el) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const sec = document.getElementById('section-' + name);
+  if (sec) sec.classList.add('active');
+  if (el) el.classList.add('active');
+  document.getElementById('pg-title').textContent = TITLES[name] || name;
+  currentSection = name;
+  if (name === 'leads') loadLeads();
+  if (name === 'orders') loadOrders();
+  if (name === 'lucky-draw') loadLD();
+}
+
+function refreshCurrent() {
+  if (currentSection === 'leads') loadLeads();
+  else if (currentSection === 'orders') loadOrders();
+  else if (currentSection === 'lucky-draw') loadLD();
+  else if (currentSection === 'overview') loadMetrics();
+  else loadAllConfig();
+}
+
+/* ======================================================
+   METRICS
+====================================================== */
+async function loadMetrics() {
+  try {
+    const [mr, ldr] = await Promise.all([
+      fetch('/api/admin/metrics', { headers: AUTH_HDR() }),
+      fetch('/api/lucky-draw/entries', { headers: AUTH_HDR() })
+    ]);
+    if (mr.ok) {
+      const m = await mr.json();
+      document.getElementById('m-leads').textContent = m.totalLeads ?? '—';
+      document.getElementById('m-verified').textContent = m.verifiedLeads ?? '—';
+      document.getElementById('m-orders').textContent = m.totalOrders ?? '—';
+      document.getElementById('m-revenue').textContent = m.revenue ? '₹' + Number(m.revenue).toLocaleString('en-IN') : '—';
+      document.getElementById('m-conv').textContent = m.conversionRate != null ? m.conversionRate + '%' : '—';
+    }
+    if (ldr.ok) {
+      const ld = await ldr.json();
+      document.getElementById('m-ld').textContent = (ld.totalTickets ?? 0).toLocaleString('en-IN');
+    }
+    renderChecklist();
+  } catch (e) { console.error('Metrics error', e); }
+}
+
+async function renderChecklist() {
+  let cfg = {};
+  try {
+    const r = await fetch('/api/admin/config?keys=RAZORPAY_KEY_ID,WHATSAPP_BUSINESS_NUMBER,RESEND_API_KEY,ADMIN_PASSWORD,GA4_MEASUREMENT_ID,MONGODB_URI', { headers: AUTH_HDR() });
+    if (r.ok) cfg = (await r.json()).config || {};
+  } catch(e){}
+  const checks = [
+    { label: 'Razorpay API keys configured', done: !!cfg.RAZORPAY_KEY_ID },
+    { label: 'WhatsApp business number set', done: !!cfg.WHATSAPP_BUSINESS_NUMBER },
+    { label: 'Email (Resend) API key configured', done: !!cfg.RESEND_API_KEY },
+    { label: 'Admin password changed from default', done: cfg.ADMIN_PASSWORD && cfg.ADMIN_PASSWORD !== 'Admin@ShubhaUtsav2026' },
+    { label: 'Google Analytics GA4 ID configured', done: !!cfg.GA4_MEASUREMENT_ID },
+    { label: 'MongoDB URI connected (optional)', done: !!cfg.MONGODB_URI },
+  ];
+  document.getElementById('checklist-body').innerHTML = checks.map(c =>
+    `<div class="check-row"><span style="font-size:1.1rem;">${c.done ? '✅' : '⬜'}</span><span style="color:${c.done ? 'var(--success)' : 'var(--text)'};">${c.label}</span></div>`
+  ).join('');
+}
+
+/* ======================================================
+   LEADS
+====================================================== */
+async function loadLeads() {
+  const search = document.getElementById('lead-search')?.value || '';
+  const city = document.getElementById('lead-city')?.value || '';
+  const status = document.getElementById('lead-status')?.value || '';
+  const params = new URLSearchParams();
+  if (search) params.set('search', search);
+  if (city) params.set('city', city);
+  if (status) params.set('status', status);
+  const tbody = document.getElementById('leads-tbody');
+  try {
+    const r = await fetch('/api/admin/leads?' + params, { headers: AUTH_HDR() });
+    const leads = await r.json();
+    const arr = Array.isArray(leads) ? leads : (leads.leads || []);
+    document.getElementById('leads-sub').textContent = `${arr.length} lead${arr.length !== 1 ? 's' : ''}`;
+    if (!arr.length) {
+      tbody.innerHTML = `<tr><td colspan="9"><div class="empty"><div class="ei">👥</div>No leads found.</div></td></tr>`;
+      return;
+    }
+    tbody.innerHTML = arr.map(l => `<tr>
+      <td><code style="font-size:.75rem;">${esc(l.leadId||'—')}</code></td>
+      <td><strong>${esc(l.companyName||l['Company Name']||'—')}</strong></td>
+      <td>${esc(l.name||l['Name']||'—')}</td>
+      <td style="font-size:.78rem;">${esc(l.email||l['Email']||'—')}</td>
+      <td>${esc(l.phone||l['Phone']||'—')}</td>
+      <td>${esc(l.selectedCity||l['Selected City']||'—')}</td>
+      <td>${esc(l.employeeCount||l['Employee Count']||'—')}</td>
+      <td>${statusBadge(l.verificationStatus||l['Verification Status'])}</td>
+      <td style="font-size:.75rem;color:var(--muted);">${fmtDate(l.createdDate||l['Recorded Timestamp'])}</td>
+    </tr>`).join('');
+  } catch (e) {
+    tbody.innerHTML = `<tr><td colspan="9"><div class="empty">Error loading leads: ${esc(e.message)}</div></td></tr>`;
+  }
+}
+
+/* ======================================================
+   ORDERS
+====================================================== */
+async function loadOrders() {
+  const search = document.getElementById('order-search')?.value || '';
+  const orderStatus = document.getElementById('order-status')?.value || '';
+  const paymentStatus = document.getElementById('order-payment')?.value || '';
+  const params = new URLSearchParams();
+  if (search) params.set('search', search);
+  if (orderStatus) params.set('orderStatus', orderStatus);
+  if (paymentStatus) params.set('paymentStatus', paymentStatus);
+  const tbody = document.getElementById('orders-tbody');
+  try {
+    const r = await fetch('/api/admin/orders?' + params, { headers: AUTH_HDR() });
+    const orders = await r.json();
+    const arr = Array.isArray(orders) ? orders : (orders.orders || []);
+    document.getElementById('orders-sub').textContent = `${arr.length} order${arr.length !== 1 ? 's' : ''}`;
+    if (!arr.length) {
+      tbody.innerHTML = `<tr><td colspan="9"><div class="empty"><div class="ei">📦</div>No orders found.</div></td></tr>`;
+      return;
+    }
+    tbody.innerHTML = arr.map(o => `<tr>
+      <td><code style="font-size:.75rem;">${esc(o.orderId||'—')}</code></td>
+      <td><strong>${esc(o.companyName||'—')}</strong></td>
+      <td style="font-size:.78rem;">${esc(o.contactPerson||'—')}</td>
+      <td>${esc(o.employeeCount||'—')}</td>
+      <td style="font-weight:600;">₹${Number(o.totalAmount||0).toLocaleString('en-IN')}</td>
+      <td>${statusBadge(o.orderStatus)}</td>
+      <td>${paymentBadge(o.paymentStatus)}</td>
+      <td>${deliveryBadge(o.deliveryStatus)}</td>
+      <td>
+        <button class="btn btn-ghost btn-sm" onclick="openOrderModal('${esc(o.orderId)}','${esc(o.orderStatus||'')}','${esc(o.paymentStatus||'')}','${esc(o.deliveryStatus||'')}')">✏️ Manage</button>
+      </td>
+    </tr>`).join('');
+  } catch (e) {
+    tbody.innerHTML = `<tr><td colspan="9"><div class="empty">Error loading orders: ${esc(e.message)}</div></td></tr>`;
+  }
+}
+
+/* ======================================================
+   ORDER MODAL
+====================================================== */
+function openOrderModal(orderId, orderStatus, paymentStatus, deliveryStatus) {
+  currentOrderId = orderId;
+  document.getElementById('om-id').textContent = orderId;
+  setSelect('om-order-status', orderStatus);
+  setSelect('om-payment-status', paymentStatus);
+  setSelect('om-delivery-status', deliveryStatus);
+  document.getElementById('om-note').value = '';
+  document.getElementById('om-notes-list').innerHTML = '<div class="spinner"></div> Loading notes…';
+  document.getElementById('order-modal').classList.add('open');
+  loadOrderNotes(orderId);
+}
+
+function closeOrderModal() {
+  document.getElementById('order-modal').classList.remove('open');
+  currentOrderId = null;
+}
+
+async function loadOrderNotes(orderId) {
+  try {
+    const r = await fetch('/api/admin/orders?search=' + encodeURIComponent(orderId), { headers: AUTH_HDR() });
+    const data = await r.json();
+    const arr = Array.isArray(data) ? data : (data.orders || []);
+    const order = arr.find(o => o.orderId === orderId);
+    const el = document.getElementById('om-notes-list');
+    if (!order || !order.notes || !order.notes.length) {
+      el.textContent = 'No notes yet.';
+      return;
+    }
+    el.innerHTML = '<strong style="font-size:.78rem;color:var(--muted);">Previous Notes:</strong>' +
+      order.notes.map(n => `<div style="padding:6px 0;border-bottom:1px solid var(--border);font-size:.8rem;"><span style="color:var(--muted);font-size:.72rem;">[${fmtDate(n.createdAt)}]</span> ${esc(n.text)}</div>`).join('');
+  } catch (e) {
+    document.getElementById('om-notes-list').textContent = 'Could not load notes.';
+  }
+}
+
+async function saveOrderStatus() {
+  if (!currentOrderId) return;
+  const body = {
+    orderStatus: document.getElementById('om-order-status').value,
+    paymentStatus: document.getElementById('om-payment-status').value,
+    deliveryStatus: document.getElementById('om-delivery-status').value,
+  };
+  try {
+    const r = await fetch('/api/admin/orders/' + currentOrderId + '/status', {
+      method: 'PUT', headers: { 'Content-Type': 'application/json', ...AUTH_HDR() },
+      body: JSON.stringify(body)
+    });
+    const d = await r.json();
+    if (r.ok && d.success) { toast('✅ Order status updated!', 'success'); loadOrders(); }
+    else toast('Error: ' + (d.error || 'Update failed'), 'error');
+  } catch (e) { toast('Network error: ' + e.message, 'error'); }
+}
+
+async function addOrderNote() {
+  if (!currentOrderId) return;
+  const note = document.getElementById('om-note').value.trim();
+  if (!note) { toast('Note cannot be empty', 'warn'); return; }
+  try {
+    const r = await fetch('/api/admin/orders/' + currentOrderId + '/notes', {
+      method: 'POST', headers: { 'Content-Type': 'application/json', ...AUTH_HDR() },
+      body: JSON.stringify({ note })
+    });
+    const d = await r.json();
+    if (r.ok && d.success) {
+      toast('✅ Note added!', 'success');
+      document.getElementById('om-note').value = '';
+      loadOrderNotes(currentOrderId);
+    } else toast('Error: ' + (d.error || 'Failed'), 'error');
+  } catch (e) { toast('Network error', 'error'); }
+}
+
+function openInvoice() {
+  if (!currentOrderId) return;
+  const url = '/api/admin/orders/' + currentOrderId + '/invoice';
+  // Inject auth via iframe src with token as query param isn't ideal
+  // So we fetch and blob it
+  fetch(url, { headers: AUTH_HDR() }).then(r => r.text()).then(html => {
+    const frame = document.getElementById('invoice-frame');
+    frame.srcdoc = html;
+    document.getElementById('invoice-modal').classList.add('open');
+  }).catch(() => toast('Could not load invoice', 'error'));
+}
+
+/* ======================================================
+   LUCKY DRAW
+====================================================== */
+async function loadLD() {
+  try {
+    const r = await fetch('/api/lucky-draw/entries', { headers: AUTH_HDR() });
+    const d = await r.json();
+    document.getElementById('ld-cos').textContent = d.count ?? 0;
+    document.getElementById('ld-tix').textContent = (d.totalTickets ?? 0).toLocaleString('en-IN');
+    document.getElementById('ld-sub').textContent = `${d.count ?? 0} companies enrolled`;
+    const tbody = document.getElementById('ld-tbody');
+    if (!d.entries?.length) {
+      tbody.innerHTML = `<tr><td colspan="7"><div class="empty"><div class="ei">🎟️</div>No enrollments yet.</div></td></tr>`;
+      return;
+    }
+    tbody.innerHTML = d.entries.map(e => `<tr>
+      <td><strong>${esc(e.company)}</strong></td>
+      <td>${esc(e.contactName||'—')}</td>
+      <td style="font-size:.78rem;">${esc(e.contactEmail)}</td>
+      <td>${esc(e.employeeCount)}</td>
+      <td><span class="badge badge-gold">${esc(e.ticketsIssued)} tickets</span></td>
+      <td style="font-size:.78rem;">${esc(e.orderRef)}</td>
+      <td style="font-size:.75rem;color:var(--muted);">${fmtDate(e.enrolledAt)}</td>
+    </tr>`).join('');
+  } catch (e) {
+    document.getElementById('ld-tbody').innerHTML = `<tr><td colspan="7"><div class="empty">Error loading data.</div></td></tr>`;
+  }
+}
+
+/* ======================================================
+   CONFIG READ / WRITE
+====================================================== */
+async function loadAllConfig() {
+  await loadCfg(ALLOWED_CFG_KEYS);
+}
+
+async function loadCfg(keys) {
+  if (!TOKEN) return;
+  try {
+    const r = await fetch('/api/admin/config?keys=' + keys.join(','), { headers: AUTH_HDR() });
+    const d = await r.json();
+    if (!d.config) return;
+    for (const [k, v] of Object.entries(d.config)) {
+      const el = document.getElementById('cfg-' + k);
+      if (el && v) el.value = v;
+    }
+    updateWaLink();
+  } catch (e) { console.error('loadCfg', e); }
+}
+
+async function saveCfg(keys) {
+  const payload = {};
+  for (const k of keys) {
+    const el = document.getElementById('cfg-' + k);
+    if (el?.value?.trim()) payload[k] = el.value.trim();
+  }
+  if (!Object.keys(payload).length) { toast('No values to save.', 'warn'); return; }
+  try {
+    const r = await fetch('/api/admin/config', {
+      method: 'POST', headers: { 'Content-Type': 'application/json', ...AUTH_HDR() },
+      body: JSON.stringify({ config: payload })
+    });
+    const d = await r.json();
+    if (r.ok && d.success) { toast('✅ Config saved! Server uses new values on next start.', 'success'); updateWaLink(); }
+    else toast('Error: ' + (d.message || 'Save failed'), 'error');
+  } catch (e) { toast('Network error', 'error'); }
+}
+
+/* ======================================================
+   WHATSAPP PREVIEW
+====================================================== */
+function updateWaPreview() {
+  const msg = document.getElementById('wa-msg')?.value || '';
+  const el = document.getElementById('wa-preview');
+  if (el) el.innerHTML = esc(msg).replace(/\*(.*?)\*/g, '<strong>$1</strong>');
+  updateWaLink();
+}
+function updateWaLink() {
+  const num = document.getElementById('cfg-WHATSAPP_BUSINESS_NUMBER')?.value?.trim() || 'YOURNUMBER';
+  const msg = encodeURIComponent(document.getElementById('wa-msg')?.value || '');
+  const el = document.getElementById('wa-link');
+  if (el) el.innerHTML = `<a href="https://wa.me/${num}?text=${msg}" target="_blank" style="color:var(--info);font-size:.78rem;">Test click-to-chat link ↗</a>`;
+}
+
+/* ======================================================
+   REVEAL TOGGLE
+====================================================== */
+function rev(id) {
+  const el = document.getElementById(id);
+  el.type = el.type === 'password' ? 'text' : 'password';
+}
+
+/* ======================================================
+   UTILITIES
+====================================================== */
+function esc(s) { return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function fmtDate(iso) {
+  if (!iso) return '—';
+  try { return new Date(iso).toLocaleString('en-IN', { day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' }); }
+  catch { return String(iso); }
+}
+function setSelect(id, val) {
+  const el = document.getElementById(id);
+  if (!el || !val) return;
+  for (const opt of el.options) { if (opt.value === val || opt.text === val) { el.value = opt.value; break; } }
+}
+function statusBadge(s) {
+  if (!s) return '—';
+  const map = { Verified:'badge-green', Pending:'badge-warn', Rejected:'badge-red', Confirmed:'badge-green', Closed:'badge-blue', 'In Production':'badge-warn', Dispatched:'badge-warn', Delivered:'badge-green' };
+  return `<span class="badge ${map[s]||'badge-gold'}">${esc(s)}</span>`;
+}
+function paymentBadge(s) {
+  if (!s) return '—';
+  const map = { Paid:'badge-green', 'Advance Paid':'badge-warn', Unpaid:'badge-red', Refunded:'badge-blue' };
+  return `<span class="badge ${map[s]||'badge-gold'}">${esc(s)}</span>`;
+}
+function deliveryBadge(s) {
+  if (!s) return '—';
+  const map = { Delivered:'badge-green', Dispatched:'badge-warn', 'Out for Delivery':'badge-warn', 'Not Started':'badge-red' };
+  return `<span class="badge ${map[s]||'badge-gold'}">${esc(s)}</span>`;
+}
+function toast(msg, type = 'success') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'show ' + type;
+  clearTimeout(t._t);
+  t._t = setTimeout(() => t.className = '', 4200);
+}
+
+// Close modals on overlay click
+document.getElementById('order-modal').addEventListener('click', e => { if (e.target === e.currentTarget) closeOrderModal(); });
+document.getElementById('invoice-modal').addEventListener('click', e => { if (e.target === e.currentTarget) document.getElementById('invoice-modal').classList.remove('open'); });
+</script>
+</body>
+</html>

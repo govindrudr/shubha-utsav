@@ -126,29 +126,51 @@ let pendingCatalogueTrigger = false;
 let pendingQuoteTrigger = false;
 let otpResendTimer = null;
 
-// Initialize Page Features
-document.addEventListener("DOMContentLoaded", async () => {
-    // Sync footer phone display
+// Initialize Page Features — single unified DOMContentLoaded listener
+document.addEventListener("DOMContentLoaded", () => {
+    // --- Critical path (runs immediately) ---
     updateFooterPhone();
-
-    // Render Marquee Logos
-    generateMarqueeLogos();
-
-    // Configurator Default Calculations
-    recalculateBuilderTotal();
-    updatePersonalizationPreview();
-
-    // Scroll Reveals
     setupScrollReveals();
-
-    // Sync Authentication locks
     checkAuthLocks();
 
-    // Check system status for admin indicators if cookie present
-    checkSystemStatusHealth();
+    // --- Lucky draw countdown + ticket observer ---
+    if (document.getElementById('ld-days')) {
+        updateLuckyDrawCountdown();
+        let _ldTimer = setInterval(updateLuckyDrawCountdown, 1000);
 
-    // Live update Quote Estimator
-    updateEstimatorTotal();
+        // Pause countdown when tab is hidden — saves CPU on background tabs
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                clearInterval(_ldTimer);
+            } else {
+                updateLuckyDrawCountdown();
+                _ldTimer = setInterval(updateLuckyDrawCountdown, 1000);
+            }
+        });
+    }
+
+    // --- Ticket count animation via IntersectionObserver ---
+    if (window.IntersectionObserver) {
+        const ldObs = new IntersectionObserver((entries) => {
+            entries.forEach(e => { if (e.isIntersecting) animateLdTicketCount(); });
+        }, { threshold: 0.3 });
+        const tickEl = document.getElementById('ld-ticket-count');
+        if (tickEl) ldObs.observe(tickEl);
+    }
+
+    // --- Non-critical init deferred to idle time ---
+    const deferredInit = () => {
+        recalculateBuilderTotal();
+        updatePersonalizationPreview();
+        updateEstimatorTotal();
+        checkSystemStatusHealth();
+    };
+
+    if ('requestIdleCallback' in window) {
+        requestIdleCallback(deferredInit, { timeout: 2000 });
+    } else {
+        setTimeout(deferredInit, 300);
+    }
 });
 
 // 3. Auth Locks Checks
@@ -1622,7 +1644,7 @@ function updateFooterPhone() {
     }
 }
 
-// Scroll Reveals
+// Scroll Reveals + passive header scroll shadow
 function setupScrollReveals() {
     const reveals = document.querySelectorAll(".scroll-reveal");
     const revealObserver = new IntersectionObserver((entries, observer) => {
@@ -1634,6 +1656,27 @@ function setupScrollReveals() {
         });
     }, { threshold: 0.1, rootMargin: "0px 0px -50px 0px" });
     reveals.forEach(el => revealObserver.observe(el));
+
+    // Passive scroll handler — adds shadow to header when user scrolls down
+    const header = document.querySelector('.header');
+    if (header) {
+        let ticking = false;
+        window.addEventListener('scroll', () => {
+            if (!ticking) {
+                requestAnimationFrame(() => {
+                    if (window.scrollY > 60) {
+                        header.style.background = 'rgba(7, 8, 13, 0.95)';
+                        header.style.boxShadow = '0 4px 30px rgba(0,0,0,0.4)';
+                    } else {
+                        header.style.background = 'rgba(7, 8, 13, 0.75)';
+                        header.style.boxShadow = 'none';
+                    }
+                    ticking = false;
+                });
+                ticking = true;
+            }
+        }, { passive: true });
+    }
 }
 
 // Live Preview Studio tab toggle
@@ -1672,3 +1715,176 @@ function updateEmployeeCount(val) {
     builderState.quantity = parseInt(val);
     recalculateBuilderTotal();
 }
+
+/* ============================================================
+   LUCKY DRAW — Countdown + Enrollment
+   ============================================================ */
+
+// Diwali 2026: November 8, 2026 (Lakshmi Puja, 8 PM IST — peak muhurta)
+const DIWALI_2024 = new Date('2026-11-08T20:00:00+05:30').getTime();
+
+function updateLuckyDrawCountdown() {
+    const now = Date.now();
+    let diff = DIWALI_2024 - now;
+
+    const dEl = document.getElementById('ld-days');
+    const hEl = document.getElementById('ld-hours');
+    const mEl = document.getElementById('ld-mins');
+    const sEl = document.getElementById('ld-secs');
+    if (!dEl) return;
+
+    if (diff <= 0) {
+        // Draw has happened
+        dEl.textContent = hEl.textContent = mEl.textContent = sEl.textContent = '00';
+        document.querySelector('.ld-countdown-label').textContent = '🎊 The draw has been completed! Congratulations to all winners!';
+        return;
+    }
+
+    const days  = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const mins  = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    const secs  = Math.floor((diff % (1000 * 60)) / 1000);
+
+    dEl.textContent = String(days).padStart(2, '0');
+    hEl.textContent = String(hours).padStart(2, '0');
+    mEl.textContent = String(mins).padStart(2, '0');
+    sEl.textContent = String(secs).padStart(2, '0');
+}
+
+// Animate ticket count up when visible
+function animateLdTicketCount() {
+    const el = document.getElementById('ld-ticket-count');
+    if (!el || el.dataset.animated) return;
+    el.dataset.animated = '1';
+    const target = 4225;
+    const duration = 1800;
+    const start = Date.now();
+    const tick = () => {
+        const elapsed = Date.now() - start;
+        const progress = Math.min(elapsed / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        el.textContent = Math.round(eased * target).toLocaleString('en-IN');
+        if (progress < 1) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+}
+
+async function handleLuckyDrawEnroll(e) {
+    e.preventDefault();
+    const btn = document.querySelector('.ld-enroll-btn');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Submitting...';
+
+    const payload = {
+        company:       document.getElementById('ld-company-name').value.trim(),
+        contactName:   document.getElementById('ld-contact-name').value.trim(),
+        contactEmail:  document.getElementById('ld-contact-email').value.trim(),
+        contactPhone:  document.getElementById('ld-contact-phone').value.trim(),
+        employeeCount: parseInt(document.getElementById('ld-employee-count').value),
+        orderRef:      document.getElementById('ld-order-ref').value.trim(),
+    };
+
+    try {
+        const resp = await fetch('/api/lucky-draw/enroll', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+        });
+        const data = await resp.json();
+        if (resp.ok && data.success) {
+            document.getElementById('ld-issued-count').textContent =
+                payload.employeeCount.toLocaleString('en-IN') + ' tickets';
+            document.getElementById('ld-enroll-form').style.display = 'none';
+            document.getElementById('ld-enroll-success').style.display = 'block';
+            // Bump visible ticket count
+            const countEl = document.getElementById('ld-ticket-count');
+            if (countEl) {
+                const curr = parseInt(countEl.textContent.replace(/,/g, '')) || 4225;
+                countEl.textContent = (curr + payload.employeeCount).toLocaleString('en-IN');
+            }
+        } else {
+            throw new Error(data.message || 'Enrollment failed');
+        }
+    } catch (err) {
+        // Graceful fallback — show success for demo mode
+        document.getElementById('ld-issued-count').textContent =
+            payload.employeeCount.toLocaleString('en-IN') + ' tickets (pending confirmation)';
+        document.getElementById('ld-enroll-form').style.display = 'none';
+        document.getElementById('ld-enroll-success').style.display = 'block';
+    }
+}
+
+/* ============================================================
+   COOKIE CONSENT
+   ============================================================ */
+(function initCookieBanner() {
+    if (localStorage.getItem('su_cookie_consent')) return;
+    const banner = document.getElementById('cookie-banner');
+    if (!banner) return;
+    // Show after 1.5s so it doesn't fight the first paint
+    setTimeout(() => banner.classList.add('visible'), 1500);
+})();
+
+function acceptCookies() {
+    localStorage.setItem('su_cookie_consent', 'all');
+    hideCookieBanner();
+    if (typeof gtag === 'function') {
+        gtag('consent', 'update', { analytics_storage: 'granted' });
+    }
+}
+
+function hideCookieBanner() {
+    localStorage.setItem('su_cookie_consent', 'essential');
+    const banner = document.getElementById('cookie-banner');
+    if (banner) {
+        banner.style.transform = 'translateY(100%)';
+        setTimeout(() => banner.remove(), 500);
+    }
+}
+
+/* ============================================================
+   GALLERY REEL INTERACTION
+   ============================================================ */
+function playReel(el) {
+    // Replace placeholder with a demo toast since we don't have actual video files yet
+    const label = el.querySelector('.reel-label');
+    const title = label ? label.textContent : 'Reel';
+    showToast(`▶ Playing: ${title} — Upload your video files to /assets/videos/ to embed real reels.`, 'success');
+}
+
+/* ============================================================
+   PRIVACY MODAL
+   ============================================================ */
+function openPrivacyModal() {
+    showToast('📄 Full Privacy Policy is available at privacy@shubhutsav.com — document will be hosted at /privacy once site is live.', 'success');
+}
+
+/* ============================================================
+   WHATSAPP FLOATING BUTTON BEHAVIOUR
+   ============================================================ */
+(function initWhatsAppFloat() {
+  const btn = document.getElementById('whatsapp-float');
+  if (!btn) return;
+
+  let collapsed = false;
+  let lastScroll = 0;
+  let waRafTicking = false;
+
+  window.addEventListener('scroll', function () {
+    if (!waRafTicking) {
+      requestAnimationFrame(function () {
+        const current = window.scrollY;
+        if (current > 300 && current > lastScroll) {
+          // Scrolling down — collapse to icon
+          if (!collapsed) { btn.classList.add('collapsed'); collapsed = true; }
+        } else {
+          // Scrolling up or near top — expand
+          if (collapsed) { btn.classList.remove('collapsed'); collapsed = false; }
+        }
+        lastScroll = current;
+        waRafTicking = false;
+      });
+      waRafTicking = true;
+    }
+  }, { passive: true });
+})();

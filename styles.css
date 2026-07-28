@@ -6985,11 +6985,25 @@ section[id] {
     .estimator-grid,
     .map-container,
     .map-city-grid,
+    .form-grid,
     .form-grid.two-cols {
         grid-template-columns: 1fr !important;
         display: flex !important;
         flex-direction: column !important;
         gap: 20px !important;
+    }
+
+    .lead-modal-container {
+        overflow-y: auto !important;
+        max-height: 90vh !important;
+    }
+
+    .marquee-track.marquee-left {
+        animation: marqueeScrollLeft 10s linear infinite !important;
+    }
+
+    .marquee-track.marquee-right {
+        animation: marqueeScrollRight 12s linear infinite !important;
     }
 
     .map-svg-wrapper {

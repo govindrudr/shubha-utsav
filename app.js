@@ -132,6 +132,7 @@ document.addEventListener("DOMContentLoaded", () => {
     updateFooterPhone();
     setupScrollReveals();
     checkAuthLocks();
+    setupNavigationLinks();
 
     // --- Lucky draw countdown + ticket observer ---
     if (document.getElementById('ld-days')) {
@@ -225,8 +226,39 @@ function triggerUnboxing() {
 function scrollToSection(id) {
     const element = document.getElementById(id);
     if (element) {
-        element.scrollIntoView({ behavior: 'smooth' });
+        const elementRect = element.getBoundingClientRect();
+        const absoluteElementTop = elementRect.top + window.scrollY;
+        const offsetPosition = absoluteElementTop - 80; // 80px offset for the sticky header
+        
+        window.scrollTo({
+            top: offsetPosition,
+            behavior: 'smooth'
+        });
     }
+}
+
+function setupNavigationLinks() {
+    const links = document.querySelectorAll('.nav-link, .mobile-drawer-link');
+    links.forEach(link => {
+        link.addEventListener('click', function(e) {
+            const href = this.getAttribute('href');
+            if (href && href.startsWith('#')) {
+                e.preventDefault();
+                const targetId = href.substring(1);
+                
+                // If clicked from mobile menu drawer, close it
+                if (this.classList.contains('mobile-drawer-link')) {
+                    toggleMobileMenu();
+                }
+                
+                // Perform precise smooth scroll
+                scrollToSection(targetId);
+                
+                // Update URL hash state silently without jump
+                history.pushState(null, null, href);
+            }
+        });
+    });
 }
 
 // 6. Interactive Map

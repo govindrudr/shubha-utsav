@@ -40,6 +40,27 @@
       "leadId": "LEAD-1002",
       "createdDate": "2026-07-27T12:27:36.379Z",
       "lastUpdated": "2026-07-27T12:27:36.379Z"
+    },
+    {
+      "name": "gghj",
+      "companyName": "ddd",
+      "email": "company@google.com",
+      "phone": "9999999999",
+      "employeeCount": 50,
+      "budget": 1500,
+      "festival": "Diwali Gifting",
+      "selectedCity": "Download Hub",
+      "selectedHamper": "N/A",
+      "inquiryType": "Catalogue Request",
+      "verificationStatus": "Suspicious",
+      "isSuspicious": true,
+      "spamFlags": [
+        "Duplicate inquiry phone within 24h"
+      ],
+      "remarks": "",
+      "leadId": "LEAD-1003",
+      "createdDate": "2026-07-28T11:15:06.220Z",
+      "lastUpdated": "2026-07-28T11:15:06.220Z"
     }
   ],
   "orders": [],
@@ -54,6 +75,17 @@
       "_id": "kt0i3p5r1",
       "createdDate": "2026-07-27T09:56:38.415Z",
       "lastUpdated": "2026-07-27T09:57:38.101Z"
+    },
+    {
+      "email": "company@google.com",
+      "otp": "274192",
+      "expiresAt": "2026-07-28T11:19:51.829Z",
+      "attempts": 1,
+      "verified": true,
+      "createdAt": "2026-07-28T11:14:51.835Z",
+      "_id": "gyznpjebt",
+      "createdDate": "2026-07-28T11:14:51.932Z",
+      "lastUpdated": "2026-07-28T11:15:05.556Z"
     }
   ]
 }

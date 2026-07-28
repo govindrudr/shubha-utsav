@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -174,7 +174,7 @@
     <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
 
     <!-- Main Style Sheet — critical, load synchronously -->
-    <link rel="stylesheet" href="styles.css?v=1.0.5">
+    <link rel="stylesheet" href="styles.css?v=2.0.4">
 
     <!-- Confetti CDN — deferred, not needed for initial paint -->
     <script defer src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
@@ -201,6 +201,9 @@
                 <a href="#payment" class="nav-link">Payment</a>
             </nav>
             <div class="nav-actions">
+                <button class="theme-toggle-btn" id="theme-toggle-btn" onclick="toggleTheme()" aria-label="Toggle Theme" style="background:transparent; border:1px solid var(--border-gold); color:var(--text-main); font-size:0.85rem; font-weight:600; text-transform:uppercase; letter-spacing:1px; cursor:pointer; padding:6px 12px; border-radius:4px; display:inline-flex; align-items:center; gap:6px; margin-right:8px;">
+                    <i class="fa-solid fa-sun"></i> <span>Light Mode</span>
+                </button>
                 <button class="btn-secondary" onclick="triggerCatalogueDownload()"><i class="fa-solid fa-download"></i> Catalogue</button>
                 <button class="btn-primary trigger-quote" onclick="triggerQuoteRequest()">Get Quote</button>
                 <button class="mobile-menu-toggle" id="mobile-menu-toggle" aria-label="Toggle Menu" onclick="toggleMobileMenu()">
@@ -2409,7 +2412,7 @@
     <div class="toast-notification" id="toast-notification"></div>
 
     <!-- Main JavaScript Logic — deferred so HTML parses first -->
-    <script defer src="app.js?v=1.0.6"></script>
+    <script defer src="app.js?v=2.0.2"></script>
 
     <!-- Logo onerror fallback: replace broken images with styled company-name text -->
     <script>
@@ -2457,6 +2460,9 @@
                 <span class="brand-divider">|</span>
                 <span class="brand-main">UTSAV</span>
             </a>
+            <button class="theme-toggle-btn" id="theme-toggle-btn-mobile" onclick="toggleTheme()" aria-label="Toggle Theme" style="background:transparent; border:1px solid var(--border-gold); color:var(--text-main); font-size:0.8rem; font-weight:600; text-transform:uppercase; letter-spacing:1px; cursor:pointer; padding:4px 8px; border-radius:4px; display:inline-flex; align-items:center; gap:4px; margin-left:auto; margin-right:8px;">
+                <i class="fa-solid fa-sun"></i> <span>Light Mode</span>
+            </button>
             <button class="mobile-drawer-close" onclick="toggleMobileMenu()">&times;</button>
         </div>
         <nav class="mobile-drawer-links">

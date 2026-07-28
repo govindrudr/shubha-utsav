@@ -1,4 +1,4 @@
-﻿/* --------------------------------------------------
+/* --------------------------------------------------
    SHUBH UTSAV - PREMIUM FULL-STACK JAVASCRIPT
    -------------------------------------------------- */
 
@@ -2040,4 +2040,49 @@ if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initScrollAnimations);
 } else {
     initScrollAnimations();
+}
+
+/* ============================================================ 
+   LIGHT/DARK THEME SYSTEM IMPLEMENTATION
+   ============================================================ */
+function initThemeState() {
+    const savedTheme = localStorage.getItem('shubh_utsav_theme') || 'dark';
+    if (savedTheme === 'light') {
+        document.body.classList.add('light-theme');
+    } else {
+        document.body.classList.remove('light-theme');
+    }
+    updateThemeIcon();
+}
+
+function toggleTheme() {
+    const isLight = document.body.classList.toggle('light-theme');
+    localStorage.setItem('shubh_utsav_theme', isLight ? 'light' : 'dark');
+    updateThemeIcon();
+}
+
+function updateThemeIcon() {
+    const btn = document.getElementById('theme-toggle-btn');
+    const btnMobile = document.getElementById('theme-toggle-btn-mobile');
+    const isLight = document.body.classList.contains('light-theme');
+    
+    // Action-oriented naming: Show what mode clicking the button will switch to!
+    const targetText = isLight ? 'Dark Mode' : 'Light Mode';
+    const iconClass = isLight ? 'fa-solid fa-moon' : 'fa-solid fa-sun';
+    const content = `<i class="${iconClass}"></i> <span>${targetText}</span>`;
+    
+    if (btn) btn.innerHTML = content;
+    if (btnMobile) btnMobile.innerHTML = content;
+}
+
+// Bind to window for HTML click calls
+window.toggleTheme = toggleTheme;
+window.initThemeState = initThemeState;
+window.updateThemeIcon = updateThemeIcon;
+
+// Run immediately to avoid flashing
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initThemeState);
+} else {
+    initThemeState();
 }

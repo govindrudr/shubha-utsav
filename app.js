@@ -180,14 +180,6 @@ function checkAuthLocks() {
     
     if (isVerified) {
         if (lockOverlay) lockOverlay.style.display = 'none';
-        
-        // Populate and disable email fields in main lead modal
-        const verifiedUser = JSON.parse(localStorage.getItem('shubh_utsav_user') || '{}');
-        if (verifiedUser.name) {
-            document.getElementById("form-name").value = verifiedUser.name;
-            document.getElementById("form-company").value = verifiedUser.company;
-            document.getElementById("form-email").value = verifiedUser.email;
-        }
     } else {
         if (lockOverlay) lockOverlay.style.display = 'flex';
     }
@@ -433,7 +425,7 @@ function claimEstimatorQuote() {
     document.getElementById("form-qty").value = qty;
     document.getElementById("form-budget").value = budget;
     document.getElementById("form-locations").value = city.toUpperCase();
-    document.getElementById("form-message").value = `Estimator Quote Claim: Ready to discuss ${qty} hampers with ₹${budget} budget for ${city.toUpperCase()} delivery.`;
+    document.getElementById("form-message").value = "";
 
     // Google Analytics Event Trigger
     if (typeof gtag === 'function') {
@@ -460,7 +452,7 @@ function selectPricingBudget(amount) {
     
     document.getElementById("form-qty").value = qty;
     document.getElementById("form-budget").value = amount;
-    document.getElementById("form-message").value = `Pricing Tier Selection: Interested in budget around ₹${amount} per employee.`;
+    document.getElementById("form-message").value = "";
     openLeadModal();
 }
 
@@ -480,7 +472,7 @@ function orderPreconfiguredHamper(hamperName) {
         document.getElementById("form-budget").value = cityData.priceMin;
         document.getElementById("form-locations").value = dbKey.charAt(0).toUpperCase() + dbKey.slice(1);
     }
-    document.getElementById("form-message").value = `I am interested in ordering the curated *${hamperName}*. Please share options and catalog.`;
+    document.getElementById("form-message").value = "";
 }
 
 function submitCustomHamperToLead() {
@@ -497,14 +489,8 @@ function submitCustomHamperToLead() {
     const perUnit = builderState.baseBudget + builderState.packagingPrice + vouchersCost;
     document.getElementById("form-budget").value = perUnit;
     document.getElementById("form-locations").value = builderState.city.charAt(0).toUpperCase() + builderState.city.slice(1);
-    const company = document.getElementById("input-company").value || "Google India";
-    const specMsg = `Custom Hamper Configuration:
-- City: ${builderState.city.toUpperCase()}
-- Budget Base: ₹${builderState.baseBudget}
-- Packaging: ${builderState.packagingName}
-- Vouchers: ${builderState.vouchers.length > 0 ? builderState.vouchers.join(', ') : 'None'}`;
-    document.getElementById("form-message").value = specMsg;
-    document.getElementById("form-company").value = company;
+    document.getElementById("form-message").value = "";
+    document.getElementById("form-company").value = "";
 
     // Google Analytics Event Trigger
     if (typeof gtag === 'function') {
@@ -520,6 +506,13 @@ function submitCustomHamperToLead() {
 // 10. Modals Management
 function openLeadModal() {
     document.getElementById("lead-modal").classList.add("active");
+    
+    // Explicitly reset customer-filled fields to ensure they start completely blank
+    document.getElementById("form-name").value = "";
+    document.getElementById("form-company").value = "";
+    document.getElementById("form-email").value = "";
+    document.getElementById("form-phone").value = "";
+    document.getElementById("form-message").value = "";
     
     // Set minimum date to today
     const dateInput = document.getElementById("form-date");

@@ -823,12 +823,12 @@ body {
 
 /* Scroll left animation */
 .marquee-track.marquee-left {
-    animation: marqueeScrollLeft 35s linear infinite;
+    animation: marqueeScrollLeft 18s linear infinite;
 }
 
 /* Scroll right animation */
 .marquee-track.marquee-right {
-    animation: marqueeScrollRight 40s linear infinite;
+    animation: marqueeScrollRight 22s linear infinite;
 }
 
 @keyframes marqueeScrollLeft {
@@ -6983,12 +6983,24 @@ section[id] {
     .stats-container,
     .builder-grid,
     .estimator-grid,
+    .map-container,
     .map-city-grid,
     .form-grid.two-cols {
         grid-template-columns: 1fr !important;
         display: flex !important;
         flex-direction: column !important;
         gap: 20px !important;
+    }
+
+    .map-svg-wrapper {
+        width: 100% !important;
+        max-width: 500px !important;
+        margin: 0 auto !important;
+    }
+
+    .map-details-card {
+        width: 100% !important;
+        margin: 0 auto !important;
     }
 
     /* Fixed widths override */

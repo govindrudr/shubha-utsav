@@ -174,7 +174,7 @@
     <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
 
     <!-- Main Style Sheet — critical, load synchronously -->
-    <link rel="stylesheet" href="styles.css?v=2.0.4">
+    <link rel="stylesheet" href="styles.css?v=2.0.5">
 
     <!-- Confetti CDN — deferred, not needed for initial paint -->
     <script defer src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
@@ -988,12 +988,12 @@
                     
                     <div class="control-group">
                         <label for="input-company">Company Name</label>
-                        <input type="text" id="input-company" placeholder="Enter Company Name" value="Google India" oninput="updatePersonalizationPreview()">
+                        <input type="text" id="input-company" placeholder="Enter Company Name" value="" oninput="updatePersonalizationPreview()">
                     </div>
 
                     <div class="control-group">
                         <label for="input-employee">Employee Name (Demo)</label>
-                        <input type="text" id="input-employee" placeholder="Enter Employee Name" value="Aditya Sharma" oninput="updatePersonalizationPreview()">
+                        <input type="text" id="input-employee" placeholder="Enter Employee Name" value="" oninput="updatePersonalizationPreview()">
                     </div>
 
                     <div class="control-group">
@@ -1011,7 +1011,7 @@
 
                     <div class="control-group">
                         <label for="input-message">Custom Greeting Message</label>
-                        <textarea id="input-message" rows="3" placeholder="Enter custom message" oninput="updatePersonalizationPreview()">Wishing you and your family a wonderful Diwali filled with happiness and sweet moments.</textarea>
+                        <textarea id="input-message" rows="3" placeholder="Enter custom message" oninput="updatePersonalizationPreview()"></textarea>
                     </div>
                 </div>
             </div>
@@ -1971,7 +1971,7 @@
                     </div>
                     <div class="form-group">
                         <label for="form-festival">Festival *</label>
-                        <input type="text" id="form-festival" value="Diwali Gifting" required>
+                        <input type="text" id="form-festival" placeholder="E.g. Diwali Gifting" value="" required>
                     </div>
                     <div class="form-group full-width">
                         <label for="form-message">Special Requirements / Custom Message</label>
@@ -2412,7 +2412,7 @@
     <div class="toast-notification" id="toast-notification"></div>
 
     <!-- Main JavaScript Logic — deferred so HTML parses first -->
-    <script defer src="app.js?v=2.0.2"></script>
+    <script defer src="app.js?v=2.0.3"></script>
 
     <!-- Logo onerror fallback: replace broken images with styled company-name text -->
     <script>
@@ -2441,7 +2441,7 @@
     </script>
 
     <!-- WhatsApp Floating Button -->
-    <a href="https://wa.me/919999999999?text=%F0%9F%AA%94%20Hi!%20I%27m%20interested%20in%20Diwali%202026%20corporate%20hampers%20for%20my%20company.%20Please%20share%20the%20catalogue." 
+    <a href="https://wa.me/919422075300?text=%F0%9F%AA%94%20Hi!%20I%27m%20interested%20in%20Diwali%202026%20corporate%20hampers%20for%20my%20company.%20Please%20share%20the%20catalogue." 
        id="whatsapp-float" class="whatsapp-float" target="_blank" rel="noopener noreferrer"
        aria-label="Chat with us on WhatsApp">
       <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="#fff">

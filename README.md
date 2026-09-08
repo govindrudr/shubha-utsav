@@ -78,6 +78,13 @@ ADMIN_EMAIL=sales@shubhautsav.com
 
 The server will spin up on `http://localhost:3000`.
 
+### 5. Render Free Tier Auto-Wakeup & Keep-Alive System
+To eliminate cold-start loading issues on **Render Free Hosting** (where instances sleep after 15 minutes of inactivity):
+* **Automatic Client Warmup (`render-wakeup.js`):** On page load, `render-wakeup.js` sends an initial background ping to `/api/health` so the server starts spinning up before the user interacts with the UI.
+* **Auto-Retry Interceptor:** If a user action hits a sleeping server (network timeout / 502 / 503 / 504), the system displays a glassmorphism notification banner (*⚡ Connecting to server (waking up free Render host)...*) and retries automatically with backoff until the request completes successfully.
+* **Active Tab Keep-Alive:** Pings `/api/health` every 7 minutes while a user tab is open to prevent idle sleep.
+* **Server Self-Ping Loop:** `server.js` automatically pings its own `/api/health` endpoint every 14 minutes when deployed on Render (`RENDER_EXTERNAL_URL`).
+
 ---
 
 ## 📄 License

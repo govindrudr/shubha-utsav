@@ -1,4 +1,4 @@
-﻿require('dotenv').config();
+require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -116,10 +116,11 @@ app.use(express.static(path.join(__dirname), {
   }
 }));
 
-// Global Rate Limiter
+// Global Rate Limiter (Excludes health check / ping routes)
 const globalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 200, // Limit each IP to 200 requests per windowMs
+  max: 300, // Limit each IP to 300 requests per windowMs
+  skip: (req) => ['/api/health', '/ping', '/healthz'].includes(req.path),
   message: { error: 'Too many requests from this IP, please try again after 15 minutes.' }
 });
 app.use(globalLimiter);
@@ -214,6 +215,47 @@ const verifyRecaptcha = async (token) => {
     return false;
   }
 };
+
+/* ==========================================================================
+   HEALTH CHECK & RENDER FREE HOSTING KEEP-ALIVE SYSTEM
+   ========================================================================== */
+
+// Health & Ping Endpoints (Used for Render Cold-Start prevention & Status Monitoring)
+app.get(['/api/health', '/ping', '/healthz'], (req, res) => {
+  res.status(200).json({
+    status: 'ok',
+    service: 'Shubha Utsav B2B Gifting API',
+    timestamp: new Date().toISOString(),
+    uptime: Math.floor(process.uptime()),
+    database: mongoose.connection.readyState === 1 ? 'connected' : 'local-json-fallback',
+    renderHost: process.env.RENDER_EXTERNAL_URL || 'local'
+  });
+});
+
+// Automatic Server-side Self-Ping Keep-Alive for Render
+function startRenderKeepAlive() {
+  // 14 minutes interval (840,000 ms) — Render free tier sleeps after 15 mins
+  const PING_INTERVAL = 14 * 60 * 1000;
+  
+  setInterval(async () => {
+    try {
+      const renderUrl = process.env.RENDER_EXTERNAL_URL || process.env.PING_URL;
+      const targetUrl = renderUrl ? `${renderUrl.replace(/\/$/, '')}/api/health` : `http://localhost:${PORT}/api/health`;
+      
+      const res = await fetch(targetUrl, { 
+        headers: { 'User-Agent': 'ShubhaUtsav-KeepAlive/1.0' } 
+      });
+      if (res.ok) {
+        console.log(`[Render KeepAlive] Server self-ping successful to ${targetUrl} (${new Date().toLocaleTimeString()})`);
+      }
+    } catch (err) {
+      console.warn('[Render KeepAlive] Self-ping status:', err.message);
+    }
+  }, PING_INTERVAL);
+}
+
+// Start keep-alive self ping
+startRenderKeepAlive();
 
 /* ==========================================================================
    AUTHENTICATION API

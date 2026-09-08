@@ -363,8 +363,8 @@
           </div>
           <div class="cfg-group">
             <div class="cfg-group-title">Business Number</div>
-            <div class="field-row"><label class="field-lbl">Phone <span class="field-req">*</span></label><div class="fi"><input type="text" id="cfg-WHATSAPP_BUSINESS_NUMBER" placeholder="919876543210" oninput="updateWaLink()" style="font-family:inherit;"></div></div>
-            <div class="field-hint">Country code + number, no + or spaces. E.g. 919876543210</div>
+            <div class="field-row"><label class="field-lbl">Phone <span class="field-req">*</span></label><div class="fi"><input type="text" id="cfg-WHATSAPP_BUSINESS_NUMBER" placeholder="919657487262" oninput="updateWaLink()" style="font-family:inherit;"></div></div>
+            <div class="field-hint">Country code + number, no + or spaces. E.g. 919657487262</div>
           </div>
           <div class="cfg-group">
             <div class="cfg-group-title">WhatsApp Cloud API (optional)</div>
@@ -936,7 +936,7 @@ function updateWaPreview() {
   updateWaLink();
 }
 function updateWaLink() {
-  const num = document.getElementById('cfg-WHATSAPP_BUSINESS_NUMBER')?.value?.trim() || 'YOURNUMBER';
+  const num = document.getElementById('cfg-WHATSAPP_BUSINESS_NUMBER')?.value?.trim() || '919657487262';
   const msg = encodeURIComponent(document.getElementById('wa-msg')?.value || '');
   const el = document.getElementById('wa-link');
   if (el) el.innerHTML = `<a href="https://wa.me/${num}?text=${msg}" target="_blank" style="color:var(--info);font-size:.78rem;">Test click-to-chat link ↗</a>`;

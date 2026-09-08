@@ -478,7 +478,7 @@ function compileHtml(baseHtml, data, mainContentHtml, isBlog = false) {
       "description": "${data.description}",
       "url": "${data.canonical}",
       "image": "https://shubhutsav.com/diwali_hamper_premium.png",
-      "telephone": "+91 94220 75300",
+      "telephone": "+91 9657487262",
       "address": {
         "@type": "PostalAddress",
         "streetAddress": "Luxury Towers, MG Road",
@@ -596,7 +596,7 @@ function renderCityPage(cityKey, baseHtml) {
               <div class="seo-actions">
                   <button class="btn-primary" onclick="openLeadModal()">Request Bulk Quote</button>
                   <button class="btn-outline" onclick="triggerCatalogueDownload()">Download Catalogue</button>
-                  <button class="btn-whatsapp" onclick="window.open('https://wa.me/919422075300?text=Hello%20Team%2C%20I%20am%20inquiring%20about%20corporate%20gifting%20for%20${city.name}%20offices.', '_blank')"><i class="fa-brands fa-whatsapp"></i> Chat on WhatsApp</button>
+                  <button class="btn-whatsapp" onclick="window.open('https://wa.me/919657487262?text=Hello%20Team%2C%20I%20am%20inquiring%20about%20corporate%20gifting%20for%20${city.name}%20offices.', '_blank')"><i class="fa-brands fa-whatsapp"></i> Chat on WhatsApp</button>
               </div>
           </div>
       </section>
@@ -790,7 +790,7 @@ function renderBlogPost(slug, baseHtml) {
                       <p>Get a personalized quote matching your budget and brand. Direct shipping to multiple locations across India.</p>
                       <button class="btn-primary btn-block" onclick="openLeadModal()">Request Quote Now</button>
                       <button class="btn-outline btn-block" onclick="triggerCatalogueDownload()"><i class="fa-solid fa-download"></i> Download Catalogue</button>
-                      <button class="btn-whatsapp btn-block" onclick="window.open('https://wa.me/919422075300?text=Hello%20Team%2C%20I%20am%20inquiring%20about%20corporate%20gifting%20after%20reading%20your%20article%3A%20${encodeURIComponent(art.title)}', '_blank')"><i class="fa-brands fa-whatsapp"></i> Chat on WhatsApp</button>
+                      <button class="btn-whatsapp btn-block" onclick="window.open('https://wa.me/919657487262?text=Hello%20Team%2C%20I%20am%20inquiring%20about%20corporate%20gifting%20after%20reading%20your%20article%3A%20${encodeURIComponent(art.title)}', '_blank')"><i class="fa-brands fa-whatsapp"></i> Chat on WhatsApp</button>
                   </div>
               </aside>
           </div>
